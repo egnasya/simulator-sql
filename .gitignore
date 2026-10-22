@@ -1,9 +1,11 @@
-# Промежуточная выгрузка из Redash
-all_queries.json
 
-# Секреты
+# Secrets and local configuration
 .env
 .env.*
+!.env.example
+
+# Redash intermediate exports and local manifests
+all_queries.json
 
 # Python
 __pycache__/
@@ -11,5 +13,8 @@ __pycache__/
 .venv/
 venv/
 
+# macOS
 .DS_Store
-**/.DS_Store
+
+# Local logs
+*.log
