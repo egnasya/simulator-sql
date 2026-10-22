@@ -1,0 +1,15 @@
+# Промежуточная выгрузка из Redash
+all_queries.json
+
+# Секреты
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+.DS_Store
+**/.DS_Store
