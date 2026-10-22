@@ -18,3 +18,8 @@ venv/
 
 # Local logs
 *.log
+
+# Local Redash manifests
+.redash_simple_manifest.json
+.redash_product_manifest.json
+.redash_dashboards_manifest.json
