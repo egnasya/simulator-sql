@@ -1,0 +1,1770 @@
+{
+  "id": 11283,
+  "slug": "-",
+  "name": "Ключевые метрики сервиса доставки",
+  "user_id": 56987,
+  "user": {
+    "id": 56987,
+    "name": "Анастасия Егорова",
+    "email": "eg.nastyaa@gmail.com",
+    "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon"
+  },
+  "layout": [],
+  "dashboard_filters_enabled": false,
+  "widgets": [
+    {
+      "id": 44327,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 0
+        }
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-25T19:13:56.037Z",
+      "created_at": "2026-10-25T19:13:56.037Z",
+      "visualization": {
+        "id": 208123,
+        "type": "CHART",
+        "name": "Dynamics of new users and couriers",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "new_couriers": "y",
+            "new_users": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:13:56.037Z",
+        "created_at": "2026-10-22T16:37:27.176Z",
+        "query": {
+          "id": 136948,
+          "latest_query_data_id": 16810623,
+          "name": "ежедневный_прирост_и_общее_число_пользователей_и_курьеров",
+          "description": null,
+          "query": "-- Для каждого дня, представленного в таблицах user_actions и courier_actions, рассчитайте следующие показатели:\n--  - Число новых пользователей.\n--  - Число новых курьеров.\n--  - Общее число пользователей на текущий день.\n--  - Общее число курьеров на текущий день.\n-- Колонки с показателями назовите соответственно new_users, new_couriers, total_users, total_couriers. Колонку с датами назовите date.\n-- Проследите за тем, чтобы показатели были выражены целыми числами. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, new_users, new_couriers, total_users, total_couriers\n\nWITH date_list AS (\n  SELECT\n    ua.time :: date AS date\n  FROM\n    user_actions ua\n  UNION\n  SELECT\n    ca.time :: date AS date\n  FROM\n    courier_actions ca\n  ORDER BY\n    date\n),\n\nnumbered_users AS (\n  SELECT\n    time :: date AS date,\n    user_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY user_id\n      ORDER BY\n        time\n    ) AS user_order_number\n  FROM\n    user_actions\n),\n\nnumbered_couriers AS (\n  SELECT\n    time :: date AS date,\n    courier_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY courier_id\n      ORDER BY\n        time\n    ) AS courier_order_number\n  FROM\n    courier_actions\n),\n\nnew_users AS (\n    SELECT date, COUNT(user_id) AS new_users\n    FROM numbered_users\n    WHERE user_order_number = 1\n    GROUP BY date\n),\n\nnew_couriers AS (\n    SELECT date, COUNT(courier_id) AS new_couriers\n    FROM numbered_couriers\n    WHERE courier_order_number = 1\n    GROUP BY date\n),\n\ndaily_users AS (\n    SELECT\n        date,\n        SUM(new_users) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_users\n    FROM new_users\n),\n\ndaily_couriers AS (\n    SELECT\n        date,\n        SUM(new_couriers) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_couriers\n    FROM new_couriers\n)\n\n\nSELECT\n  dl.date,\n  COALESCE(new_users, 0) AS new_users,\n  total_users::int,\n  COALESCE(new_couriers, 0) AS new_couriers,\n  total_couriers::int\nFROM\n  date_list dl\n  LEFT JOIN new_users nu ON dl.date = nu.date\n  LEFT JOIN new_couriers nc ON dl.date = nc.date\n  LEFT JOIN daily_users du ON dl.date = du.date\n  LEFT JOIN daily_couriers dc ON dl.date = dc.date\nORDER BY dl.date\n  ",
+          "query_hash": "b7073e9731f905af4e71b069d70b9eca",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": false,
+          "updated_at": "2026-10-25T19:13:29.584Z",
+          "created_at": "2026-10-22T16:36:03.796Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44328,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 0
+        }
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-25T19:14:08.784Z",
+      "created_at": "2026-10-25T19:14:08.784Z",
+      "visualization": {
+        "id": 208124,
+        "type": "CHART",
+        "name": "Dynamics of the total number of users and couriers",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "total_couriers": "y",
+            "total_users": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:14:08.784Z",
+        "created_at": "2026-10-22T16:38:07.938Z",
+        "query": {
+          "id": 136948,
+          "latest_query_data_id": 16810623,
+          "name": "ежедневный_прирост_и_общее_число_пользователей_и_курьеров",
+          "description": null,
+          "query": "-- Для каждого дня, представленного в таблицах user_actions и courier_actions, рассчитайте следующие показатели:\n--  - Число новых пользователей.\n--  - Число новых курьеров.\n--  - Общее число пользователей на текущий день.\n--  - Общее число курьеров на текущий день.\n-- Колонки с показателями назовите соответственно new_users, new_couriers, total_users, total_couriers. Колонку с датами назовите date.\n-- Проследите за тем, чтобы показатели были выражены целыми числами. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, new_users, new_couriers, total_users, total_couriers\n\nWITH date_list AS (\n  SELECT\n    ua.time :: date AS date\n  FROM\n    user_actions ua\n  UNION\n  SELECT\n    ca.time :: date AS date\n  FROM\n    courier_actions ca\n  ORDER BY\n    date\n),\n\nnumbered_users AS (\n  SELECT\n    time :: date AS date,\n    user_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY user_id\n      ORDER BY\n        time\n    ) AS user_order_number\n  FROM\n    user_actions\n),\n\nnumbered_couriers AS (\n  SELECT\n    time :: date AS date,\n    courier_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY courier_id\n      ORDER BY\n        time\n    ) AS courier_order_number\n  FROM\n    courier_actions\n),\n\nnew_users AS (\n    SELECT date, COUNT(user_id) AS new_users\n    FROM numbered_users\n    WHERE user_order_number = 1\n    GROUP BY date\n),\n\nnew_couriers AS (\n    SELECT date, COUNT(courier_id) AS new_couriers\n    FROM numbered_couriers\n    WHERE courier_order_number = 1\n    GROUP BY date\n),\n\ndaily_users AS (\n    SELECT\n        date,\n        SUM(new_users) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_users\n    FROM new_users\n),\n\ndaily_couriers AS (\n    SELECT\n        date,\n        SUM(new_couriers) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_couriers\n    FROM new_couriers\n)\n\n\nSELECT\n  dl.date,\n  COALESCE(new_users, 0) AS new_users,\n  total_users::int,\n  COALESCE(new_couriers, 0) AS new_couriers,\n  total_couriers::int\nFROM\n  date_list dl\n  LEFT JOIN new_users nu ON dl.date = nu.date\n  LEFT JOIN new_couriers nc ON dl.date = nc.date\n  LEFT JOIN daily_users du ON dl.date = du.date\n  LEFT JOIN daily_couriers dc ON dl.date = dc.date\nORDER BY dl.date\n  ",
+          "query_hash": "b7073e9731f905af4e71b069d70b9eca",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": false,
+          "updated_at": "2026-10-25T19:13:29.584Z",
+          "created_at": "2026-10-22T16:36:03.796Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44329,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 8
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:01:50.461Z",
+      "created_at": "2026-10-25T19:14:58.407Z",
+      "visualization": {
+        "id": 208131,
+        "type": "CHART",
+        "name": "Dynamics of the growth in the number of new users and couriers",
+        "description": "",
+        "options": {
+          "globalSeriesType": "column",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "new_users_change": "y",
+            "new_couriers_change": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm"
+        },
+        "updated_at": "2026-10-25T19:14:58.407Z",
+        "created_at": "2026-10-22T19:40:47.739Z",
+        "query": {
+          "id": 136954,
+          "latest_query_data_id": 16810622,
+          "name": "процентный_прирост_пользователей_и_курьеров_по_дням",
+          "description": null,
+          "query": "-- Дополните запрос из предыдущего задания и теперь для каждого дня, представленного в таблицах user_actions и courier_actions, дополнительно рассчитайте следующие показатели:\n--  - Прирост числа новых пользователей.\n--  - Прирост числа новых курьеров.\n--  - Прирост общего числа пользователей.\n--  - Прирост общего числа курьеров.\n-- Показатели, рассчитанные на предыдущем шаге, также включите в результирующую таблицу.\n-- Все показатели прироста считайте в процентах относительно значений в предыдущий день. При расчёте показателей округляйте значения до двух знаков после запятой.\n-- Результирующая таблица должна быть отсортирована по возрастанию даты.\n-- Поля в результирующей таблице: date, new_users, new_couriers, total_users, total_couriers, new_users_change, new_couriers_change, total_users_growth, total_couriers_growth\n\nWITH date_list AS (\n  SELECT\n    ua.time :: date AS date\n  FROM\n    user_actions ua\n  UNION\n  SELECT\n    ca.time :: date AS date\n  FROM\n    courier_actions ca\n  ORDER BY\n    date\n),\n\nnumbered_users AS (\n  SELECT\n    time :: date AS date,\n    user_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY user_id\n      ORDER BY\n        time\n    ) AS user_order_number\n  FROM\n    user_actions\n),\n\nnumbered_couriers AS (\n  SELECT\n    time :: date AS date,\n    courier_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY courier_id\n      ORDER BY\n        time\n    ) AS courier_order_number\n  FROM\n    courier_actions\n),\n\nnew_users AS (\n    SELECT date, COUNT(user_id) AS new_users\n    FROM numbered_users\n    WHERE user_order_number = 1\n    GROUP BY date\n),\n\nnew_couriers AS (\n    SELECT date, COUNT(courier_id) AS new_couriers\n    FROM numbered_couriers\n    WHERE courier_order_number = 1\n    GROUP BY date\n),\n\ndaily_users AS (\n    SELECT\n        date,\n        SUM(new_users) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_users\n    FROM new_users\n),\n\ndaily_couriers AS (\n    SELECT\n        date,\n        SUM(new_couriers) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_couriers\n    FROM new_couriers\n)\n\n\nSELECT\n  dl.date,\n  COALESCE(new_users, 0) AS new_users,\n  COALESCE(new_couriers, 0) AS new_couriers,\n  total_users::int,\n  total_couriers::int,\n  ROUND((new_users::numeric - LAG(new_users) OVER()) / LAG(new_users) OVER() * 100, 2) AS new_users_change,\n  ROUND((new_couriers::numeric - LAG(new_couriers) OVER()) / LAG(new_couriers) OVER() * 100, 2) AS new_couriers_change,\n  ROUND((total_users::numeric - LAG(total_users) OVER()) / (LAG(total_users) OVER()) * 100, 2) AS total_users_growth,\n  ROUND((total_couriers::numeric - LAG(total_couriers) OVER()) / (LAG(total_couriers) OVER()) * 100, 2) AS total_couriers_growth\nFROM\n  date_list dl\n  LEFT JOIN new_users nu ON dl.date = nu.date\n  LEFT JOIN new_couriers nc ON dl.date = nc.date\n  LEFT JOIN daily_users du ON dl.date = du.date\n  LEFT JOIN daily_couriers dc ON dl.date = dc.date\nORDER BY dl.date\n\n",
+          "query_hash": "e4daefc26daf3d4107d4ba75e817a3db",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-22T19:41:33.067Z",
+          "created_at": "2026-10-22T19:34:46.184Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44330,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 8
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:01:47.375Z",
+      "created_at": "2026-10-25T19:15:06.830Z",
+      "visualization": {
+        "id": 208132,
+        "type": "CHART",
+        "name": "Dynamics of growth in the total number of users and couriers",
+        "description": "",
+        "options": {
+          "globalSeriesType": "column",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "total_users_growth": "y",
+            "total_couriers_growth": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm"
+        },
+        "updated_at": "2026-10-25T19:15:06.830Z",
+        "created_at": "2026-10-22T19:41:26.102Z",
+        "query": {
+          "id": 136954,
+          "latest_query_data_id": 16810622,
+          "name": "процентный_прирост_пользователей_и_курьеров_по_дням",
+          "description": null,
+          "query": "-- Дополните запрос из предыдущего задания и теперь для каждого дня, представленного в таблицах user_actions и courier_actions, дополнительно рассчитайте следующие показатели:\n--  - Прирост числа новых пользователей.\n--  - Прирост числа новых курьеров.\n--  - Прирост общего числа пользователей.\n--  - Прирост общего числа курьеров.\n-- Показатели, рассчитанные на предыдущем шаге, также включите в результирующую таблицу.\n-- Все показатели прироста считайте в процентах относительно значений в предыдущий день. При расчёте показателей округляйте значения до двух знаков после запятой.\n-- Результирующая таблица должна быть отсортирована по возрастанию даты.\n-- Поля в результирующей таблице: date, new_users, new_couriers, total_users, total_couriers, new_users_change, new_couriers_change, total_users_growth, total_couriers_growth\n\nWITH date_list AS (\n  SELECT\n    ua.time :: date AS date\n  FROM\n    user_actions ua\n  UNION\n  SELECT\n    ca.time :: date AS date\n  FROM\n    courier_actions ca\n  ORDER BY\n    date\n),\n\nnumbered_users AS (\n  SELECT\n    time :: date AS date,\n    user_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY user_id\n      ORDER BY\n        time\n    ) AS user_order_number\n  FROM\n    user_actions\n),\n\nnumbered_couriers AS (\n  SELECT\n    time :: date AS date,\n    courier_id,\n    order_id,\n    ROW_NUMBER() OVER(\n      PARTITION BY courier_id\n      ORDER BY\n        time\n    ) AS courier_order_number\n  FROM\n    courier_actions\n),\n\nnew_users AS (\n    SELECT date, COUNT(user_id) AS new_users\n    FROM numbered_users\n    WHERE user_order_number = 1\n    GROUP BY date\n),\n\nnew_couriers AS (\n    SELECT date, COUNT(courier_id) AS new_couriers\n    FROM numbered_couriers\n    WHERE courier_order_number = 1\n    GROUP BY date\n),\n\ndaily_users AS (\n    SELECT\n        date,\n        SUM(new_users) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_users\n    FROM new_users\n),\n\ndaily_couriers AS (\n    SELECT\n        date,\n        SUM(new_couriers) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_couriers\n    FROM new_couriers\n)\n\n\nSELECT\n  dl.date,\n  COALESCE(new_users, 0) AS new_users,\n  COALESCE(new_couriers, 0) AS new_couriers,\n  total_users::int,\n  total_couriers::int,\n  ROUND((new_users::numeric - LAG(new_users) OVER()) / LAG(new_users) OVER() * 100, 2) AS new_users_change,\n  ROUND((new_couriers::numeric - LAG(new_couriers) OVER()) / LAG(new_couriers) OVER() * 100, 2) AS new_couriers_change,\n  ROUND((total_users::numeric - LAG(total_users) OVER()) / (LAG(total_users) OVER()) * 100, 2) AS total_users_growth,\n  ROUND((total_couriers::numeric - LAG(total_couriers) OVER()) / (LAG(total_couriers) OVER()) * 100, 2) AS total_couriers_growth\nFROM\n  date_list dl\n  LEFT JOIN new_users nu ON dl.date = nu.date\n  LEFT JOIN new_couriers nc ON dl.date = nc.date\n  LEFT JOIN daily_users du ON dl.date = du.date\n  LEFT JOIN daily_couriers dc ON dl.date = dc.date\nORDER BY dl.date\n\n",
+          "query_hash": "e4daefc26daf3d4107d4ba75e817a3db",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-22T19:41:33.067Z",
+          "created_at": "2026-10-22T19:34:46.184Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44338,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 40
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:02:07.047Z",
+      "created_at": "2026-10-25T19:16:15.788Z",
+      "visualization": {
+        "id": 208422,
+        "type": "CHART",
+        "name": "Dynamics of the cancel rate indicator and the number of successful/cancelled orders",
+        "description": "",
+        "options": {
+          "globalSeriesType": "column",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true,
+              "rangeMin": 0
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": "stack",
+            "error_y": {
+              "type": "data",
+              "visible": true
+            },
+            "percentValues": false
+          },
+          "seriesOptions": {
+            "successful_orders": {
+              "type": "column",
+              "zIndex": 0
+            },
+            "canceled_orders": {
+              "type": "column",
+              "zIndex": 1,
+              "yAxis": 0
+            },
+            "cancel_rate": {
+              "type": "line",
+              "zIndex": 2,
+              "yAxis": 1
+            }
+          },
+          "valuesOptions": {},
+          "columnMapping": {
+            "hour": "x",
+            "successful_orders": "y",
+            "canceled_orders": "y",
+            "cancel_rate": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:16:15.788Z",
+        "created_at": "2026-10-25T19:06:53.730Z",
+        "query": {
+          "id": 137139,
+          "latest_query_data_id": 16810629,
+          "name": "успешные_и_отменённые_заказы_по_часам",
+          "description": null,
+          "query": "-- На основе данных в таблице orders для каждого часа в сутках рассчитайте следующие показатели:\n--  - Число успешных (доставленных) заказов.\n--  - Число отменённых заказов.\n--  - Долю отменённых заказов в общем числе заказов (cancel rate).\n-- При расчёте доли отменённых заказов округляйте значения до трёх знаков после запятой. Результирующая таблица должна быть отсортирована по возрастанию колонки\n-- с часом оформления заказа.\n-- Поля в результирующей таблице: hour, successful_orders, canceled_orders, cancel_rate\n\nSELECT\n    DISTINCT EXTRACT(HOUR FROM creation_time)::int AS hour,\n    COUNT(DISTINCT ca.order_id) FILTER(WHERE ca.order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')) AS successful_orders,\n    COUNT(DISTINCT ca.order_id) FILTER(WHERE ca.order_id IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) AS canceled_orders,\n    ROUND(COUNT(DISTINCT ca.order_id) FILTER(WHERE ca.order_id IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) \n        / COUNT(DISTINCT ca.order_id)::decimal, 3) AS cancel_rate\nFROM orders o \n    JOIN courier_actions ca ON o.order_id = ca.order_id\nGROUP BY 1\nORDER BY 1",
+          "query_hash": "f6cb945ddeacd6372f7ffb68435fdff8",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-25T19:07:58.679Z",
+          "created_at": "2026-10-25T19:01:33.096Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44331,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 16
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:01:50.456Z",
+      "created_at": "2026-10-25T19:15:15.612Z",
+      "visualization": {
+        "id": 208164,
+        "type": "CHART",
+        "name": "The dynamics of paying users and active couriers",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "paying_users": "y",
+            "active_couriers": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:15:15.612Z",
+        "created_at": "2026-10-23T08:34:58.223Z",
+        "query": {
+          "id": 136976,
+          "latest_query_data_id": 16810630,
+          "name": "платящие_пользователи_и_активные_курьеры_по_дням",
+          "description": null,
+          "query": "-- Для каждого дня, представленного в таблицах user_actions и courier_actions, рассчитайте следующие показатели:\n--  - Число платящих пользователей.\n--  - Число активных курьеров.\n--  - Долю платящих пользователей в общем числе пользователей на текущий день.\n--  - Долю активных курьеров в общем числе курьеров на текущий день.\n-- Проследите за тем, чтобы абсолютные показатели были выражены целыми числами. Все показатели долей необходимо выразить в процентах. При их расчёте округляйте \n-- значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты. \n\n-- Поля в результирующей таблице: date, paying_users, active_couriers, paying_users_share, active_couriers_share\n\nWITH paying_users AS (\n    SELECT \n        DISTINCT time::date AS date,\n        COUNT(user_id) OVER(PARTITION BY time::date) AS paying_users\n    FROM user_actions\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY 1, user_id\n),\n\nactive_couriers AS (\n    SELECT\n        DISTINCT time::date AS date,\n        COUNT(courier_id) OVER(PARTITION BY time::date) AS active_couriers\n    FROM courier_actions ca\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n    GROUP BY 1, courier_id\n),\n\nall_users AS (\n    SELECT\n        date,\n        SUM(new_users) OVER(ORDER BY date) AS all_users\n    FROM (\n        SELECT\n            date,\n            COUNT(user_id) AS new_users\n        FROM (\n            SELECT\n                time :: date AS date,\n                user_id,\n                order_id,\n                ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY time) AS user_order_number\n            FROM\n                user_actions\n            ) t1\n        WHERE user_order_number = 1\n        GROUP BY date\n        ) t2\n),\n\nall_new_couriers AS (\n    SELECT\n        date,\n        SUM(new_couriers) OVER(ORDER BY date) AS all_couriers\n    FROM (\n        SELECT\n            date,\n            COUNT(courier_id) AS new_couriers\n        FROM (\n            SELECT\n                time :: date AS date,\n                courier_id,\n                order_id,\n                ROW_NUMBER() OVER(PARTITION BY courier_id ORDER BY time) AS courier_order_number\n            FROM\n                courier_actions\n            ) t3\n        WHERE courier_order_number = 1\n        GROUP BY date\n        ) t4\n)\n\nSELECT\n    py.date,\n    paying_users,\n    active_couriers,\n    ROUND(paying_users::decimal / au.all_users * 100, 2) AS paying_users_share,\n    ROUND(active_couriers::decimal / anc.all_couriers * 100, 2) AS active_couriers_share\nFROM paying_users py\n    LEFT JOIN active_couriers ac\n    ON py.date = ac.date\n    LEFT JOIN all_users au \n    ON py.date = au.date\n    LEFT JOIN all_new_couriers anc \n    ON py.date = anc.date \nORDER BY py.date\n    ",
+          "query_hash": "d63b4747a2a108c02c254a0cf0afb54d",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-23T08:36:25.562Z",
+          "created_at": "2026-10-23T08:34:12.328Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44332,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 16
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:01:50.464Z",
+      "created_at": "2026-10-25T19:15:26.841Z",
+      "visualization": {
+        "id": 208165,
+        "type": "CHART",
+        "name": "Dynamics of the share of paying users and active couriers",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "paying_users_share": "y",
+            "active_couriers_share": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:15:26.841Z",
+        "created_at": "2026-10-23T08:35:30.590Z",
+        "query": {
+          "id": 136976,
+          "latest_query_data_id": 16810630,
+          "name": "платящие_пользователи_и_активные_курьеры_по_дням",
+          "description": null,
+          "query": "-- Для каждого дня, представленного в таблицах user_actions и courier_actions, рассчитайте следующие показатели:\n--  - Число платящих пользователей.\n--  - Число активных курьеров.\n--  - Долю платящих пользователей в общем числе пользователей на текущий день.\n--  - Долю активных курьеров в общем числе курьеров на текущий день.\n-- Проследите за тем, чтобы абсолютные показатели были выражены целыми числами. Все показатели долей необходимо выразить в процентах. При их расчёте округляйте \n-- значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты. \n\n-- Поля в результирующей таблице: date, paying_users, active_couriers, paying_users_share, active_couriers_share\n\nWITH paying_users AS (\n    SELECT \n        DISTINCT time::date AS date,\n        COUNT(user_id) OVER(PARTITION BY time::date) AS paying_users\n    FROM user_actions\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY 1, user_id\n),\n\nactive_couriers AS (\n    SELECT\n        DISTINCT time::date AS date,\n        COUNT(courier_id) OVER(PARTITION BY time::date) AS active_couriers\n    FROM courier_actions ca\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n    GROUP BY 1, courier_id\n),\n\nall_users AS (\n    SELECT\n        date,\n        SUM(new_users) OVER(ORDER BY date) AS all_users\n    FROM (\n        SELECT\n            date,\n            COUNT(user_id) AS new_users\n        FROM (\n            SELECT\n                time :: date AS date,\n                user_id,\n                order_id,\n                ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY time) AS user_order_number\n            FROM\n                user_actions\n            ) t1\n        WHERE user_order_number = 1\n        GROUP BY date\n        ) t2\n),\n\nall_new_couriers AS (\n    SELECT\n        date,\n        SUM(new_couriers) OVER(ORDER BY date) AS all_couriers\n    FROM (\n        SELECT\n            date,\n            COUNT(courier_id) AS new_couriers\n        FROM (\n            SELECT\n                time :: date AS date,\n                courier_id,\n                order_id,\n                ROW_NUMBER() OVER(PARTITION BY courier_id ORDER BY time) AS courier_order_number\n            FROM\n                courier_actions\n            ) t3\n        WHERE courier_order_number = 1\n        GROUP BY date\n        ) t4\n)\n\nSELECT\n    py.date,\n    paying_users,\n    active_couriers,\n    ROUND(paying_users::decimal / au.all_users * 100, 2) AS paying_users_share,\n    ROUND(active_couriers::decimal / anc.all_couriers * 100, 2) AS active_couriers_share\nFROM paying_users py\n    LEFT JOIN active_couriers ac\n    ON py.date = ac.date\n    LEFT JOIN all_users au \n    ON py.date = au.date\n    LEFT JOIN all_new_couriers anc \n    ON py.date = anc.date \nORDER BY py.date\n    ",
+          "query_hash": "d63b4747a2a108c02c254a0cf0afb54d",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-23T08:36:25.562Z",
+          "created_at": "2026-10-23T08:34:12.328Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44333,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 24
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:01:50.456Z",
+      "created_at": "2026-10-25T19:15:34.103Z",
+      "visualization": {
+        "id": 208282,
+        "type": "CHART",
+        "name": "The share of users with one or multiple orders",
+        "description": "",
+        "options": {
+          "globalSeriesType": "column",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": "stack",
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "single_order_users_share": "y",
+            "several_orders_users_share": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:15:34.103Z",
+        "created_at": "2026-10-24T14:51:08.596Z",
+        "query": {
+          "id": 137045,
+          "latest_query_data_id": 16810621,
+          "name": "доли_пользователей_с_одним_и_несколькими_заказами_по_дням",
+          "description": null,
+          "query": "-- Для каждого дня, представленного в таблице user_actions, рассчитайте следующие показатели:\n--  - Долю пользователей, сделавших в этот день всего один заказ, в общем количестве платящих пользователей.\n--  - Долю пользователей, сделавших в этот день несколько заказов, в общем количестве платящих пользователей.\n-- Колонки с показателями назовите соответственно single_order_users_share, several_orders_users_share. Колонку с датами назовите date. Все показатели\n-- с долями необходимо выразить в процентах. При расчёте долей округляйте значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, single_order_users_share, several_orders_users_share\n\nWITH count_paying_users AS (\n    SELECT \n        time::date AS date,\n        COUNT(DISTINCT user_id) AS paying_users\n    FROM user_actions\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY 1\n), \n\nuser_order_counts AS (\n    SELECT \n        date,\n        COUNT(DISTINCT user_id) FILTER(WHERE count_orders = 1) AS one_order,\n        COUNT(DISTINCT user_id) FILTER(WHERE count_orders > 1) AS more_one_order\n    FROM (\n        SELECT\n            time::date AS date,\n            user_id,\n            COUNT(order_id) AS count_orders\n        FROM user_actions\n        WHERE action != 'cancel_order' AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        GROUP BY 1,2\n        ) cuo\n    GROUP BY date\n)\n\nSELECT\n    pu.date,\n    ROUND(one_order::decimal / paying_users * 100, 2) AS single_order_users_share,\n    ROUND(more_one_order::decimal / paying_users * 100, 2) AS several_orders_users_share\nFROM count_paying_users pu \n    LEFT JOIN user_order_counts uo ON pu.date = uo.date",
+          "query_hash": "caf5da43d0a3959af37899f3e9900095",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-24T14:51:21.348Z",
+          "created_at": "2026-10-24T14:49:24.541Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44334,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 24
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:01:50.464Z",
+      "created_at": "2026-10-25T19:15:42.633Z",
+      "visualization": {
+        "id": 208405,
+        "type": "CHART",
+        "name": "Dynamics of the total number of orders, the number of first orders, and the number of orders from new users",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "orders": "y",
+            "first_orders": "y",
+            "new_users_orders": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:15:42.633Z",
+        "created_at": "2026-10-25T17:38:50.197Z",
+        "query": {
+          "id": 137127,
+          "latest_query_data_id": 16810628,
+          "name": "первые_заказы_и_заказы_новых_пользователей_по_дням",
+          "description": null,
+          "query": "-- Для каждого дня, представленного в таблице user_actions, рассчитайте следующие показатели:\n--  - Общее число заказов.\n--  - Число первых заказов (заказов, сделанных пользователями впервые).\n--  - Число заказов новых пользователей (заказов, сделанных пользователями в тот же день, когда они впервые воспользовались сервисом).\n--  - Долю первых заказов в общем числе заказов (долю п.2 в п.1).\n--  - Долю заказов новых пользователей в общем числе заказов (долю п.3 в п.1).\n-- Проследите за тем, чтобы во всех случаях количество заказов было выражено целым числом. Все показатели с долями необходимо выразить в процентах. При расчёте долей \n-- округляйте значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, orders, first_orders, new_users_orders, first_orders_share, new_users_orders_share\n\nSELECT \n    date,\n    COUNT(DISTINCT order_id) AS orders,\n    COUNT(DISTINCT order_id) FILTER(WHERE order_number = 1) AS first_orders,\n    COUNT(DISTINCT order_id) FILTER(WHERE date = date_firs_order::date) AS new_users_orders,\n    ROUND(COUNT(DISTINCT order_id) FILTER(WHERE order_number = 1) / COUNT(DISTINCT order_id)::decimal * 100, 2) AS first_orders_share,\n    ROUND(COUNT(DISTINCT order_id) FILTER(WHERE date = date_firs_order) / COUNT(DISTINCT order_id)::decimal * 100, 2) AS new_users_orders_share\nFROM (\n    SELECT\n        time::date AS date,\n        ua.user_id,\n        order_id,\n        ROW_NUMBER() OVER(PARTITION BY ua.user_id ORDER BY time) AS order_number,\n        fd.date_firs_order AS date_firs_order\n    FROM user_actions ua\n    JOIN (SELECT user_id, MIN(time::date) OVER(PARTITION BY user_id) AS date_firs_order FROM user_actions) fd ON ua.user_id = fd.user_id\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n) t\nGROUP BY date\nORDER BY date",
+          "query_hash": "fc4ef969c9594244df1c6c02864adfbb",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-25T17:39:30.971Z",
+          "created_at": "2026-10-25T17:19:16.924Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44335,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 32
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:02:03.720Z",
+      "created_at": "2026-10-25T19:15:51.212Z",
+      "visualization": {
+        "id": 208406,
+        "type": "CHART",
+        "name": "Dynamics of the share of first orders and the share of orders from new users in the total number of orders",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "first_orders_share": "y",
+            "new_users_orders_share": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:15:51.212Z",
+        "created_at": "2026-10-25T17:39:23.439Z",
+        "query": {
+          "id": 137127,
+          "latest_query_data_id": 16810628,
+          "name": "первые_заказы_и_заказы_новых_пользователей_по_дням",
+          "description": null,
+          "query": "-- Для каждого дня, представленного в таблице user_actions, рассчитайте следующие показатели:\n--  - Общее число заказов.\n--  - Число первых заказов (заказов, сделанных пользователями впервые).\n--  - Число заказов новых пользователей (заказов, сделанных пользователями в тот же день, когда они впервые воспользовались сервисом).\n--  - Долю первых заказов в общем числе заказов (долю п.2 в п.1).\n--  - Долю заказов новых пользователей в общем числе заказов (долю п.3 в п.1).\n-- Проследите за тем, чтобы во всех случаях количество заказов было выражено целым числом. Все показатели с долями необходимо выразить в процентах. При расчёте долей \n-- округляйте значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, orders, first_orders, new_users_orders, first_orders_share, new_users_orders_share\n\nSELECT \n    date,\n    COUNT(DISTINCT order_id) AS orders,\n    COUNT(DISTINCT order_id) FILTER(WHERE order_number = 1) AS first_orders,\n    COUNT(DISTINCT order_id) FILTER(WHERE date = date_firs_order::date) AS new_users_orders,\n    ROUND(COUNT(DISTINCT order_id) FILTER(WHERE order_number = 1) / COUNT(DISTINCT order_id)::decimal * 100, 2) AS first_orders_share,\n    ROUND(COUNT(DISTINCT order_id) FILTER(WHERE date = date_firs_order) / COUNT(DISTINCT order_id)::decimal * 100, 2) AS new_users_orders_share\nFROM (\n    SELECT\n        time::date AS date,\n        ua.user_id,\n        order_id,\n        ROW_NUMBER() OVER(PARTITION BY ua.user_id ORDER BY time) AS order_number,\n        fd.date_firs_order AS date_firs_order\n    FROM user_actions ua\n    JOIN (SELECT user_id, MIN(time::date) OVER(PARTITION BY user_id) AS date_firs_order FROM user_actions) fd ON ua.user_id = fd.user_id\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n) t\nGROUP BY date\nORDER BY date",
+          "query_hash": "fc4ef969c9594244df1c6c02864adfbb",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-25T17:39:30.971Z",
+          "created_at": "2026-10-25T17:19:16.924Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44336,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 32
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:02:00.384Z",
+      "created_at": "2026-10-25T19:16:00.007Z",
+      "visualization": {
+        "id": 208412,
+        "type": "CHART",
+        "name": "Dynamics of the number of users and orders per courier",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "users_per_courier": "y",
+            "orders_per_courier": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:16:00.007Z",
+        "created_at": "2026-10-25T18:01:24.684Z",
+        "query": {
+          "id": 137129,
+          "latest_query_data_id": 16810624,
+          "name": "нагрузка_на_активного_курьера_по_дням",
+          "description": null,
+          "query": "-- На основе данных в таблицах user_actions, courier_actions и orders для каждого дня рассчитайте следующие показатели:\n--  - Число платящих пользователей на одного активного курьера.\n--  - Число заказов на одного активного курьера.\n-- При расчёте показателей округляйте значения до двух знаков после запятой. Результирующая таблица должна быть отсортирована по возрастанию даты.\n-- Поля в результирующей таблице: date, users_per_courier, orders_per_courier\n\nWITH paying_users AS (\n    SELECT \n        time::date AS date,\n        COUNT(DISTINCT user_id) AS paying_users,\n        COUNT(DISTINCT order_id) AS total_orders\n    FROM user_actions\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY time::date\n),\nactive_couriers AS (\n    SELECT\n        time::date AS date,\n        COUNT(DISTINCT courier_id) AS active_couriers\n    FROM courier_actions\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n    GROUP BY time::date\n)\n\nSELECT\n    py.date,\n    ROUND(paying_users::decimal / active_couriers, 2) AS users_per_courier,\n    ROUND(total_orders::decimal / active_couriers, 2) AS orders_per_courier\nFROM paying_users py\n    JOIN active_couriers ac ON py.date = ac.date\n    ",
+          "query_hash": "504c43391dd6d4dc64c0c5c0f666cb38",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-25T18:02:12.003Z",
+          "created_at": "2026-10-25T17:46:48.184Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44337,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 40
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11283,
+      "text": "",
+      "updated_at": "2026-10-26T09:02:11.377Z",
+      "created_at": "2026-10-25T19:16:08.284Z",
+      "visualization": {
+        "id": 208420,
+        "type": "CHART",
+        "name": "Dynamics of average order delivery time",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "date": "x",
+            "minutes_to_deliver": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-10-25T19:16:08.284Z",
+        "created_at": "2026-10-25T18:39:34.360Z",
+        "query": {
+          "id": 137135,
+          "latest_query_data_id": 16810627,
+          "name": "среднее_время_доставки_заказов_по_дням",
+          "description": null,
+          "query": "-- На основе данных в таблице courier_actions для каждого дня рассчитайте, за сколько минут в среднем курьеры доставляли свои заказы. \n-- При расчёте среднего времени доставки округляйте количество минут до целых значений. Учитывайте только доставленные заказы, отменённые заказы не учитывайте. \n-- Результирующая таблица должна быть отсортирована по возрастанию даты.\n-- Поля в результирующей таблице: date, minutes_to_deliver\n\nSELECT\n    date,\n    AVG(EXTRACT(epoch FROM delivery_time) / 60)::int AS minutes_to_deliver\nFROM (\n    SELECT\n        time::date AS date,\n        order_id,\n        MAX(time) FILTER (WHERE action = 'deliver_order') - MIN(time) FILTER (WHERE action = 'accept_order') AS delivery_time\n    FROM courier_actions\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n    GROUP BY 1,2\n) t\nGROUP BY date\nORDER BY date",
+          "query_hash": "3e24010a1dab8ee5ea8872b0314d1726",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-10-25T18:39:37.584Z",
+          "created_at": "2026-10-25T18:05:26.237Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-10-25T19:11:25.935Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    }
+  ],
+  "options": {},
+  "is_archived": false,
+  "is_draft": true,
+  "tags": [
+    "product",
+    "sql_simulator"
+  ],
+  "updated_at": "2026-10-25T19:11:24.316Z",
+  "created_at": "2026-10-25T19:10:49.498Z",
+  "version": 4,
+  "is_favorite": true,
+  "can_edit": true
+}
