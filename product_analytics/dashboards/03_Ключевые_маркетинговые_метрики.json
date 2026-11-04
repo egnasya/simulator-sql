@@ -1,0 +1,989 @@
+{
+  "id": 11349,
+  "slug": "-",
+  "name": "Ключевые маркетинговые метрики",
+  "user_id": 56987,
+  "user": {
+    "id": 56987,
+    "name": "Анастасия Егорова",
+    "email": "eg.nastyaa@gmail.com",
+    "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon"
+  },
+  "layout": [],
+  "dashboard_filters_enabled": false,
+  "widgets": [
+    {
+      "id": 44626,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 0
+        }
+      },
+      "dashboard_id": 11349,
+      "text": "",
+      "updated_at": "2026-11-03T17:58:00.143Z",
+      "created_at": "2026-11-03T17:58:00.143Z",
+      "visualization": {
+        "id": 209584,
+        "type": "CHART",
+        "name": "CAC for advertising campaigns",
+        "description": "",
+        "options": {
+          "globalSeriesType": "column",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "ads_campaign": "x",
+            "cac": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": true,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "reverseX": false
+        },
+        "updated_at": "2026-11-03T17:58:00.143Z",
+        "created_at": "2026-11-03T17:55:15.284Z",
+        "query": {
+          "id": 137830,
+          "latest_query_data_id": 16893204,
+          "name": "CAC_рекламных_кампаний",
+          "description": null,
+          "query": "-- На основе таблицы user_actions рассчитайте метрику CAC для двух рекламных кампаний. Список id пользователей, пришедших после рекламной кампании № 1:\n--         8631, 8632, 8638, 8643, 8657, 8673, 8706, 8707, 8715, 8723, 8732, 8739, 8741,\n--         8750, 8751, 8752, 8770, 8774, 8788, 8791, 8804, 8810, 8815, 8828, 8830, 8845,\n--         8853, 8859, 8867, 8869, 8876, 8879, 8883, 8896, 8909, 8911, 8933, 8940, 8972,\n--         8976, 8988, 8990, 9002, 9004, 9009, 9019, 9020, 9035, 9036, 9061, 9069, 9071,\n--         9075, 9081, 9085, 9089, 9108, 9113, 9144, 9145, 9146, 9162, 9165, 9167, 9175,\n--         9180, 9182, 9197, 9198, 9210, 9223, 9251, 9257, 9278, 9287, 9291, 9313, 9317,\n--         9321, 9334, 9351, 9391, 9398, 9414, 9420, 9422, 9431, 9450, 9451, 9454, 9472,\n--         9476, 9478, 9491, 9494, 9505, 9512, 9518, 9524, 9526, 9528, 9531, 9535, 9550,\n--         9559, 9561, 9562, 9599, 9603, 9605, 9611, 9612, 9615, 9625, 9633, 9652, 9654,\n--         9655, 9660, 9662, 9667, 9677, 9679, 9689, 9695, 9720, 9726, 9739, 9740, 9762,\n--         9778, 9786, 9794, 9804, 9810, 9813, 9818, 9828, 9831, 9836, 9838, 9845, 9871,\n--         9887, 9891, 9896, 9897, 9916, 9945, 9960, 9963, 9965, 9968, 9971, 9993, 9998,\n--         9999, 10001, 10013, 10016, 10023, 10030, 10051, 10057, 10064, 10082, 10103,\n--         10105, 10122, 10134, 10135\n-- Список id пользователей, пришедших после рекламной кампании № 2:\n--         8629, 8630, 8644, 8646, 8650, 8655, 8659, 8660, 8663, 8665, 8670, 8675, 8680, 8681,\n--         8682, 8683, 8694, 8697, 8700, 8704, 8712, 8713, 8719, 8729, 8733, 8742, 8748, 8754,\n--         8771, 8794, 8795, 8798, 8803, 8805, 8806, 8812, 8814, 8825, 8827, 8838, 8849, 8851,\n--         8854, 8855, 8870, 8878, 8882, 8886, 8890, 8893, 8900, 8902, 8913, 8916, 8923, 8929,\n--         8935, 8942, 8943, 8949, 8953, 8955, 8966, 8968, 8971, 8973, 8980, 8995, 8999, 9000,\n--         9007, 9013, 9041, 9042, 9047, 9064, 9068, 9077, 9082, 9083, 9095, 9103, 9109, 9117,\n--         9123, 9127, 9131, 9137, 9140, 9149, 9161, 9179, 9181, 9183, 9185, 9190, 9196, 9203,\n--         9207, 9226, 9227, 9229, 9230, 9231, 9250, 9255, 9259, 9267, 9273, 9281, 9282, 9289,\n--         9292, 9303, 9310, 9312, 9315, 9327, 9333, 9335, 9337, 9343, 9356, 9368, 9370, 9383,\n--         9392, 9404, 9410, 9421, 9428, 9432, 9437, 9468, 9479, 9483, 9485, 9492, 9495, 9497,\n--         9498, 9500, 9510, 9527, 9529, 9530, 9538, 9539, 9545, 9557, 9558, 9560, 9564, 9567,\n--         9570, 9591, 9596, 9598, 9616, 9631, 9634, 9635, 9636, 9658, 9666, 9672, 9684, 9692,\n--         9700, 9704, 9706, 9711, 9719, 9727, 9735, 9741, 9744, 9749, 9752, 9753, 9755, 9757,\n--         9764, 9783, 9784, 9788, 9790, 9808, 9820, 9839, 9841, 9843, 9853, 9855, 9859, 9863,\n--         9877, 9879, 9880, 9882, 9883, 9885, 9901, 9904, 9908, 9910, 9912, 9920, 9929, 9930,\n--         9935, 9939, 9958, 9959, 9961, 9983, 10027, 10033, 10038, 10045, 10047, 10048, 10058,\n--         10059, 10067, 10069, 10073, 10075, 10078, 10079, 10081, 10092, 10106, 10110, 10113, 10131\n-- В рекламной кампании № 1 о нашем приложении рассказал известный блогер на Youtube-канале о кулинарии. На эту интеграцию суммарно потратили 250 тысяч рублей.\n-- В результате этой кампании 1 сентября в приложении зарегистрировался 171 человек.\n-- В рамках рекламной кампании № 2 пользователям показывали таргетированную рекламу в социальных сетях. На это тоже суммарно потратили 250 тысяч рублей,\n-- и в результате 1 сентября у нас появилось 236 новых пользователей.\n-- Колонку с наименованиями кампаний назовите ads_campaign, а колонку со значением метрики — cac. Наименования кампаний выведите в следующем виде: Кампания № 1, Кампания № 2.\n-- Полученные значения метрики округлите до двух знаков после запятой. Результат должен быть отсортирован по убыванию значения метрики.\n-- Поля в результирующей таблице: ads_campaign, cac\n\nWITH ads_campaign_users AS (\n    SELECT\n      user_id,\n      'Кампания № 1' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8631, 8632, 8638, 8643, 8657, 8673, 8706, 8707, 8715, 8723, 8732, 8739, 8741, \n        8750, 8751, 8752, 8770, 8774, 8788, 8791, 8804, 8810, 8815, 8828, 8830, 8845, \n        8853, 8859, 8867, 8869, 8876, 8879, 8883, 8896, 8909, 8911, 8933, 8940, 8972, \n        8976, 8988, 8990, 9002, 9004, 9009, 9019, 9020, 9035, 9036, 9061, 9069, 9071, \n        9075, 9081, 9085, 9089, 9108, 9113, 9144, 9145, 9146, 9162, 9165, 9167, 9175, \n        9180, 9182, 9197, 9198, 9210, 9223, 9251, 9257, 9278, 9287, 9291, 9313, 9317, \n        9321, 9334, 9351, 9391, 9398, 9414, 9420, 9422, 9431, 9450, 9451, 9454, 9472, \n        9476, 9478, 9491, 9494, 9505, 9512, 9518, 9524, 9526, 9528, 9531, 9535, 9550, \n        9559, 9561, 9562, 9599, 9603, 9605, 9611, 9612, 9615, 9625, 9633, 9652, 9654, \n        9655, 9660, 9662, 9667, 9677, 9679, 9689, 9695, 9720, 9726, 9739, 9740, 9762, \n        9778, 9786, 9794, 9804, 9810, 9813, 9818, 9828, 9831, 9836, 9838, 9845, 9871, \n        9887, 9891, 9896, 9897, 9916, 9945, 9960, 9963, 9965, 9968, 9971, 9993, 9998, \n        9999, 10001, 10013, 10016, 10023, 10030, 10051, 10057, 10064, 10082, 10103, \n        10105, 10122, 10134, 10135\n    )\n    GROUP BY user_id\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n      \n    UNION ALL \n    \n    SELECT\n      user_id,\n      'Кампания № 2' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8629, 8630, 8644, 8646, 8650, 8655, 8659, 8660, 8663, 8665, 8670, 8675, 8680, 8681,\n        8682, 8683, 8694, 8697, 8700, 8704, 8712, 8713, 8719, 8729, 8733, 8742, 8748, 8754,\n        8771, 8794, 8795, 8798, 8803, 8805, 8806, 8812, 8814, 8825, 8827, 8838, 8849, 8851,\n        8854, 8855, 8870, 8878, 8882, 8886, 8890, 8893, 8900, 8902, 8913, 8916, 8923, 8929,\n        8935, 8942, 8943, 8949, 8953, 8955, 8966, 8968, 8971, 8973, 8980, 8995, 8999, 9000,\n        9007, 9013, 9041, 9042, 9047, 9064, 9068, 9077, 9082, 9083, 9095, 9103, 9109, 9117,\n        9123, 9127, 9131, 9137, 9140, 9149, 9161, 9179, 9181, 9183, 9185, 9190, 9196, 9203,\n        9207, 9226, 9227, 9229, 9230, 9231, 9250, 9255, 9259, 9267, 9273, 9281, 9282, 9289,\n        9292, 9303, 9310, 9312, 9315, 9327, 9333, 9335, 9337, 9343, 9356, 9368, 9370, 9383,\n        9392, 9404, 9410, 9421, 9428, 9432, 9437, 9468, 9479, 9483, 9485, 9492, 9495, 9497,\n        9498, 9500, 9510, 9527, 9529, 9530, 9538, 9539, 9545, 9557, 9558, 9560, 9564, 9567,\n        9570, 9591, 9596, 9598, 9616, 9631, 9634, 9635, 9636, 9658, 9666, 9672, 9684, 9692,\n        9700, 9704, 9706, 9711, 9719, 9727, 9735, 9741, 9744, 9749, 9752, 9753, 9755, 9757,\n        9764, 9783, 9784, 9788, 9790, 9808, 9820, 9839, 9841, 9843, 9853, 9855, 9859, 9863,\n        9877, 9879, 9880, 9882, 9883, 9885, 9901, 9904, 9908, 9910, 9912, 9920, 9929, 9930,\n        9935, 9939, 9958, 9959, 9961, 9983, 10027, 10033, 10038, 10045, 10047, 10048, 10058,\n        10059, 10067, 10069, 10073, 10075, 10078, 10079, 10081, 10092, 10106, 10110, 10113, 10131\n    ) \n    GROUP BY user_id\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n )\n \nSELECT\n    ads_campaign,\n    ROUND(ads_cost / COUNT(user_id), 2) AS cac\nFROM ads_campaign_users\nGROUP BY\n    ads_campaign,\n    ads_cost\nORDER BY cac DESC\n  ",
+          "query_hash": "692c6461f66ecc3462206de1a7800afb",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-11-03T17:57:43.647Z",
+          "created_at": "2026-11-03T17:53:13.533Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44628,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 8,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 0
+        }
+      },
+      "dashboard_id": 11349,
+      "text": "",
+      "updated_at": "2026-11-03T18:15:09.484Z",
+      "created_at": "2026-11-03T18:15:09.484Z",
+      "visualization": {
+        "id": 209591,
+        "type": "CHART",
+        "name": "ROI of advertising campaigns",
+        "description": "",
+        "options": {
+          "globalSeriesType": "column",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "ads_campaign": "x",
+            "roi": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": true,
+          "dateTimeFormat": "DD/MM/YY HH:mm"
+        },
+        "updated_at": "2026-11-03T18:15:09.484Z",
+        "created_at": "2026-11-03T18:11:17.280Z",
+        "query": {
+          "id": 137834,
+          "latest_query_data_id": 16893205,
+          "name": "ROI_рекламных_кампаний",
+          "description": null,
+          "query": "-- Рассчитайте ROI для каждого рекламного канала. Полученные значения метрики необходимо выразить в процентах и округлить до двух знаков после запятой.\n-- Результат должен быть отсортирован по убыванию значения метрики.\n-- Поля в результирующей таблице: ads_campaign, roi\n\nWITH ads_campaign_users AS (\n    SELECT\n      user_id,\n      'Кампания № 1' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8631, 8632, 8638, 8643, 8657, 8673, 8706, 8707, 8715, 8723, 8732, 8739, 8741, \n        8750, 8751, 8752, 8770, 8774, 8788, 8791, 8804, 8810, 8815, 8828, 8830, 8845, \n        8853, 8859, 8867, 8869, 8876, 8879, 8883, 8896, 8909, 8911, 8933, 8940, 8972, \n        8976, 8988, 8990, 9002, 9004, 9009, 9019, 9020, 9035, 9036, 9061, 9069, 9071, \n        9075, 9081, 9085, 9089, 9108, 9113, 9144, 9145, 9146, 9162, 9165, 9167, 9175, \n        9180, 9182, 9197, 9198, 9210, 9223, 9251, 9257, 9278, 9287, 9291, 9313, 9317, \n        9321, 9334, 9351, 9391, 9398, 9414, 9420, 9422, 9431, 9450, 9451, 9454, 9472, \n        9476, 9478, 9491, 9494, 9505, 9512, 9518, 9524, 9526, 9528, 9531, 9535, 9550, \n        9559, 9561, 9562, 9599, 9603, 9605, 9611, 9612, 9615, 9625, 9633, 9652, 9654, \n        9655, 9660, 9662, 9667, 9677, 9679, 9689, 9695, 9720, 9726, 9739, 9740, 9762, \n        9778, 9786, 9794, 9804, 9810, 9813, 9818, 9828, 9831, 9836, 9838, 9845, 9871, \n        9887, 9891, 9896, 9897, 9916, 9945, 9960, 9963, 9965, 9968, 9971, 9993, 9998, \n        9999, 10001, 10013, 10016, 10023, 10030, 10051, 10057, 10064, 10082, 10103, \n        10105, 10122, 10134, 10135\n    )\n    GROUP BY user_id\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n      \n    UNION ALL \n    \n    SELECT\n      user_id,\n      'Кампания № 2' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8629, 8630, 8644, 8646, 8650, 8655, 8659, 8660, 8663, 8665, 8670, 8675, 8680, 8681,\n        8682, 8683, 8694, 8697, 8700, 8704, 8712, 8713, 8719, 8729, 8733, 8742, 8748, 8754,\n        8771, 8794, 8795, 8798, 8803, 8805, 8806, 8812, 8814, 8825, 8827, 8838, 8849, 8851,\n        8854, 8855, 8870, 8878, 8882, 8886, 8890, 8893, 8900, 8902, 8913, 8916, 8923, 8929,\n        8935, 8942, 8943, 8949, 8953, 8955, 8966, 8968, 8971, 8973, 8980, 8995, 8999, 9000,\n        9007, 9013, 9041, 9042, 9047, 9064, 9068, 9077, 9082, 9083, 9095, 9103, 9109, 9117,\n        9123, 9127, 9131, 9137, 9140, 9149, 9161, 9179, 9181, 9183, 9185, 9190, 9196, 9203,\n        9207, 9226, 9227, 9229, 9230, 9231, 9250, 9255, 9259, 9267, 9273, 9281, 9282, 9289,\n        9292, 9303, 9310, 9312, 9315, 9327, 9333, 9335, 9337, 9343, 9356, 9368, 9370, 9383,\n        9392, 9404, 9410, 9421, 9428, 9432, 9437, 9468, 9479, 9483, 9485, 9492, 9495, 9497,\n        9498, 9500, 9510, 9527, 9529, 9530, 9538, 9539, 9545, 9557, 9558, 9560, 9564, 9567,\n        9570, 9591, 9596, 9598, 9616, 9631, 9634, 9635, 9636, 9658, 9666, 9672, 9684, 9692,\n        9700, 9704, 9706, 9711, 9719, 9727, 9735, 9741, 9744, 9749, 9752, 9753, 9755, 9757,\n        9764, 9783, 9784, 9788, 9790, 9808, 9820, 9839, 9841, 9843, 9853, 9855, 9859, 9863,\n        9877, 9879, 9880, 9882, 9883, 9885, 9901, 9904, 9908, 9910, 9912, 9920, 9929, 9930,\n        9935, 9939, 9958, 9959, 9961, 9983, 10027, 10033, 10038, 10045, 10047, 10048, 10058,\n        10059, 10067, 10069, 10073, 10075, 10078, 10079, 10081, 10092, 10106, 10110, 10113, 10131\n    ) \n    GROUP BY user_id\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n),\n \nsales_by_user AS (\n    SELECT\n        user_id,\n        SUM(price) AS sales_amount\n    FROM orders o\n        CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n        JOIN user_actions ua ON ua.order_id = o.order_id\n    WHERE o.order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY user_id\n)\n \nSELECT\n    ads_campaign,\n    ROUND((SUM(sales_amount) - ads_cost) / ads_cost * 100, 2) AS roi\nFROM ads_campaign_users acu\n    JOIN sales_by_user sbu USING(user_id)\nGROUP BY ads_campaign, ads_cost",
+          "query_hash": "e4fa4ad26bf8cbf1907cb3cb88c02cf5",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-11-03T18:11:40.284Z",
+          "created_at": "2026-11-03T18:10:44.402Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44636,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 10,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 8
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11349,
+      "text": "",
+      "updated_at": "2026-11-04T13:01:07.751Z",
+      "created_at": "2026-11-04T09:43:26.684Z",
+      "visualization": {
+        "id": 209644,
+        "type": "CHART",
+        "name": "The average check amount for acquired users across advertising campaigns",
+        "description": "",
+        "options": {
+          "globalSeriesType": "column",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {},
+          "valuesOptions": {},
+          "columnMapping": {
+            "ads_campaign": "x",
+            "avg_check": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": true,
+          "dateTimeFormat": "DD/MM/YY HH:mm"
+        },
+        "updated_at": "2026-11-04T09:43:26.684Z",
+        "created_at": "2026-11-04T09:42:44.884Z",
+        "query": {
+          "id": 137836,
+          "latest_query_data_id": 16892250,
+          "name": "средний_чек_привлечённых_пользователей_по_рекламным_кампаниям",
+          "description": null,
+          "query": "-- Для каждой рекламной кампании посчитайте среднюю стоимость заказа привлечённых пользователей за первую неделю использования приложения с 1 по 7 сентября 2022 года.\n-- Полученные значения метрики необходимо округлить до двух знаков после запятой. Результат должен быть отсортирован по убыванию значения метрики.\n-- Поля в результирующей таблице: ads_campaign, avg_check\n\n\nWITH ads_campaign_users AS (\n    SELECT\n      user_id,\n      'Кампания № 1' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8631, 8632, 8638, 8643, 8657, 8673, 8706, 8707, 8715, 8723, 8732, 8739, 8741, \n        8750, 8751, 8752, 8770, 8774, 8788, 8791, 8804, 8810, 8815, 8828, 8830, 8845, \n        8853, 8859, 8867, 8869, 8876, 8879, 8883, 8896, 8909, 8911, 8933, 8940, 8972, \n        8976, 8988, 8990, 9002, 9004, 9009, 9019, 9020, 9035, 9036, 9061, 9069, 9071, \n        9075, 9081, 9085, 9089, 9108, 9113, 9144, 9145, 9146, 9162, 9165, 9167, 9175, \n        9180, 9182, 9197, 9198, 9210, 9223, 9251, 9257, 9278, 9287, 9291, 9313, 9317, \n        9321, 9334, 9351, 9391, 9398, 9414, 9420, 9422, 9431, 9450, 9451, 9454, 9472, \n        9476, 9478, 9491, 9494, 9505, 9512, 9518, 9524, 9526, 9528, 9531, 9535, 9550, \n        9559, 9561, 9562, 9599, 9603, 9605, 9611, 9612, 9615, 9625, 9633, 9652, 9654, \n        9655, 9660, 9662, 9667, 9677, 9679, 9689, 9695, 9720, 9726, 9739, 9740, 9762, \n        9778, 9786, 9794, 9804, 9810, 9813, 9818, 9828, 9831, 9836, 9838, 9845, 9871, \n        9887, 9891, 9896, 9897, 9916, 9945, 9960, 9963, 9965, 9968, 9971, 9993, 9998, \n        9999, 10001, 10013, 10016, 10023, 10030, 10051, 10057, 10064, 10082, 10103, \n        10105, 10122, 10134, 10135\n    )\n    GROUP BY user_id\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n      \n    UNION ALL \n    \n    SELECT\n      user_id,\n      'Кампания № 2' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8629, 8630, 8644, 8646, 8650, 8655, 8659, 8660, 8663, 8665, 8670, 8675, 8680, 8681,\n        8682, 8683, 8694, 8697, 8700, 8704, 8712, 8713, 8719, 8729, 8733, 8742, 8748, 8754,\n        8771, 8794, 8795, 8798, 8803, 8805, 8806, 8812, 8814, 8825, 8827, 8838, 8849, 8851,\n        8854, 8855, 8870, 8878, 8882, 8886, 8890, 8893, 8900, 8902, 8913, 8916, 8923, 8929,\n        8935, 8942, 8943, 8949, 8953, 8955, 8966, 8968, 8971, 8973, 8980, 8995, 8999, 9000,\n        9007, 9013, 9041, 9042, 9047, 9064, 9068, 9077, 9082, 9083, 9095, 9103, 9109, 9117,\n        9123, 9127, 9131, 9137, 9140, 9149, 9161, 9179, 9181, 9183, 9185, 9190, 9196, 9203,\n        9207, 9226, 9227, 9229, 9230, 9231, 9250, 9255, 9259, 9267, 9273, 9281, 9282, 9289,\n        9292, 9303, 9310, 9312, 9315, 9327, 9333, 9335, 9337, 9343, 9356, 9368, 9370, 9383,\n        9392, 9404, 9410, 9421, 9428, 9432, 9437, 9468, 9479, 9483, 9485, 9492, 9495, 9497,\n        9498, 9500, 9510, 9527, 9529, 9530, 9538, 9539, 9545, 9557, 9558, 9560, 9564, 9567,\n        9570, 9591, 9596, 9598, 9616, 9631, 9634, 9635, 9636, 9658, 9666, 9672, 9684, 9692,\n        9700, 9704, 9706, 9711, 9719, 9727, 9735, 9741, 9744, 9749, 9752, 9753, 9755, 9757,\n        9764, 9783, 9784, 9788, 9790, 9808, 9820, 9839, 9841, 9843, 9853, 9855, 9859, 9863,\n        9877, 9879, 9880, 9882, 9883, 9885, 9901, 9904, 9908, 9910, 9912, 9920, 9929, 9930,\n        9935, 9939, 9958, 9959, 9961, 9983, 10027, 10033, 10038, 10045, 10047, 10048, 10058,\n        10059, 10067, 10069, 10073, 10075, 10078, 10079, 10081, 10092, 10106, 10110, 10113, 10131\n    ) \n    GROUP BY user_id\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n),\n \nsales_by_user AS (\n    SELECT\n        user_id,\n        SUM(price) AS sales_amount\n    FROM orders o\n        CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n        JOIN user_actions ua ON ua.order_id = o.order_id\n    WHERE o.order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        AND time BETWEEN '2022-09-01 00:00:00' AND '2022-09-07 23:59:59'\n    GROUP BY user_id\n),\n\nnumber_of_orders AS (\n    SELECT\n        user_id,\n        COUNT(DISTINCT order_id) AS number_of_orders\n    FROM user_actions\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order') \n        AND time BETWEEN '2022-09-01 00:00:00' AND '2022-09-07 23:59:59'\n    GROUP BY user_id\n)\n\nSELECT\n    ads_campaign,\n    ROUND(AVG(sales_amount / number_of_orders), 2) AS avg_check\nFROM ads_campaign_users acu\n    JOIN sales_by_user sbu ON acu.user_id = sbu.user_id\n    JOIN number_of_orders no ON acu.user_id = no.user_id\nGROUP BY ads_campaign\nORDER BY avg_check DESC",
+          "query_hash": "c5b8e00c32f74dff2259456dfd826202",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-11-04T09:43:31.584Z",
+          "created_at": "2026-11-03T18:13:37.457Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44656,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 9,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 24
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11349,
+      "text": "",
+      "updated_at": "2026-11-04T13:01:35.761Z",
+      "created_at": "2026-11-04T13:00:25.000Z",
+      "visualization": {
+        "id": 209681,
+        "type": "CHART",
+        "name": "The dynamics of ARPU and CAC for the campaign №2",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {
+            "cumulative_arppu": {
+              "type": "area"
+            }
+          },
+          "valuesOptions": {},
+          "columnMapping": {
+            "day": "x",
+            "cumulative_arppu": "y",
+            "cac": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-11-04T13:00:25.000Z",
+        "created_at": "2026-11-04T12:59:13.208Z",
+        "query": {
+          "id": 137885,
+          "latest_query_data_id": 16894045,
+          "name": "накопительный_ARPPU_и_CAC_по_дням_кампания2",
+          "description": null,
+          "query": "-- Для каждой рекламной кампании для каждого дня посчитайте две метрики:\r\n--     1. Накопительный ARPPU.\r\n--     2. Затраты на привлечение одного покупателя (CAC).\r\n-- Значения метрики CAC укажите одинаковым для всех дней (это необходимо для наглядной визуализации). Дни пронумеруйте начиная с 0. Полученные значения метрик необходимо \r\n-- округлить до двух знаков после запятой. Результат должен быть отсортирован сначала по наименованию кампании (по возрастанию), затем по наименованию дня (также по возрастанию).\r\n-- Поля в результирующей таблице: ads_campaign, day, cumulative_arppu, cac\r\n\r\nWITH ads_campaign_users AS (\r\n    SELECT\r\n      user_id,\r\n      'Кампания № 1' AS ads_campaign,\r\n      250000.0 AS ads_cost\r\n    FROM user_actions \r\n    WHERE user_id IN (\r\n        8631, 8632, 8638, 8643, 8657, 8673, 8706, 8707, 8715, 8723, 8732, 8739, 8741, \r\n        8750, 8751, 8752, 8770, 8774, 8788, 8791, 8804, 8810, 8815, 8828, 8830, 8845, \r\n        8853, 8859, 8867, 8869, 8876, 8879, 8883, 8896, 8909, 8911, 8933, 8940, 8972, \r\n        8976, 8988, 8990, 9002, 9004, 9009, 9019, 9020, 9035, 9036, 9061, 9069, 9071, \r\n        9075, 9081, 9085, 9089, 9108, 9113, 9144, 9145, 9146, 9162, 9165, 9167, 9175, \r\n        9180, 9182, 9197, 9198, 9210, 9223, 9251, 9257, 9278, 9287, 9291, 9313, 9317, \r\n        9321, 9334, 9351, 9391, 9398, 9414, 9420, 9422, 9431, 9450, 9451, 9454, 9472, \r\n        9476, 9478, 9491, 9494, 9505, 9512, 9518, 9524, 9526, 9528, 9531, 9535, 9550, \r\n        9559, 9561, 9562, 9599, 9603, 9605, 9611, 9612, 9615, 9625, 9633, 9652, 9654, \r\n        9655, 9660, 9662, 9667, 9677, 9679, 9689, 9695, 9720, 9726, 9739, 9740, 9762, \r\n        9778, 9786, 9794, 9804, 9810, 9813, 9818, 9828, 9831, 9836, 9838, 9845, 9871, \r\n        9887, 9891, 9896, 9897, 9916, 9945, 9960, 9963, 9965, 9968, 9971, 9993, 9998, \r\n        9999, 10001, 10013, 10016, 10023, 10030, 10051, 10057, 10064, 10082, 10103, \r\n        10105, 10122, 10134, 10135\r\n    )\r\n    GROUP BY user_id\r\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\r\n      \r\n    UNION ALL \r\n    \r\n    SELECT\r\n      user_id,\r\n      'Кампания № 2' AS ads_campaign,\r\n      250000.0 AS ads_cost\r\n    FROM user_actions \r\n    WHERE user_id IN (\r\n        8629, 8630, 8644, 8646, 8650, 8655, 8659, 8660, 8663, 8665, 8670, 8675, 8680, 8681,\r\n        8682, 8683, 8694, 8697, 8700, 8704, 8712, 8713, 8719, 8729, 8733, 8742, 8748, 8754,\r\n        8771, 8794, 8795, 8798, 8803, 8805, 8806, 8812, 8814, 8825, 8827, 8838, 8849, 8851,\r\n        8854, 8855, 8870, 8878, 8882, 8886, 8890, 8893, 8900, 8902, 8913, 8916, 8923, 8929,\r\n        8935, 8942, 8943, 8949, 8953, 8955, 8966, 8968, 8971, 8973, 8980, 8995, 8999, 9000,\r\n        9007, 9013, 9041, 9042, 9047, 9064, 9068, 9077, 9082, 9083, 9095, 9103, 9109, 9117,\r\n        9123, 9127, 9131, 9137, 9140, 9149, 9161, 9179, 9181, 9183, 9185, 9190, 9196, 9203,\r\n        9207, 9226, 9227, 9229, 9230, 9231, 9250, 9255, 9259, 9267, 9273, 9281, 9282, 9289,\r\n        9292, 9303, 9310, 9312, 9315, 9327, 9333, 9335, 9337, 9343, 9356, 9368, 9370, 9383,\r\n        9392, 9404, 9410, 9421, 9428, 9432, 9437, 9468, 9479, 9483, 9485, 9492, 9495, 9497,\r\n        9498, 9500, 9510, 9527, 9529, 9530, 9538, 9539, 9545, 9557, 9558, 9560, 9564, 9567,\r\n        9570, 9591, 9596, 9598, 9616, 9631, 9634, 9635, 9636, 9658, 9666, 9672, 9684, 9692,\r\n        9700, 9704, 9706, 9711, 9719, 9727, 9735, 9741, 9744, 9749, 9752, 9753, 9755, 9757,\r\n        9764, 9783, 9784, 9788, 9790, 9808, 9820, 9839, 9841, 9843, 9853, 9855, 9859, 9863,\r\n        9877, 9879, 9880, 9882, 9883, 9885, 9901, 9904, 9908, 9910, 9912, 9920, 9929, 9930,\r\n        9935, 9939, 9958, 9959, 9961, 9983, 10027, 10033, 10038, 10045, 10047, 10048, 10058,\r\n        10059, 10067, 10069, 10073, 10075, 10078, 10079, 10081, 10092, 10106, 10110, 10113, 10131\r\n    ) \r\n    GROUP BY user_id\r\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\r\n ),\r\n \r\nnumber_of_users AS (\r\n    SELECT\r\n        ads_campaign,\r\n        'Day ' || (time::date - MIN(time::date) OVER(PARTITION BY ads_campaign))::varchar AS day,\r\n        COUNT(DISTINCT acu.user_id) AS number_of_users\r\n    FROM ads_campaign_users acu\r\n        JOIN user_actions ua ON acu.user_id = ua.user_id\r\n    GROUP BY\r\n        ads_campaign, time::date\r\n),\r\n\r\nsales_by_user AS (\r\n    SELECT\r\n        ads_campaign,\r\n        'Day ' || (time::date - MIN(time::date) OVER(PARTITION BY ads_campaign))::varchar AS day,\r\n        SUM(price) AS sales_amount\r\n    FROM orders o\r\n        CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\r\n        JOIN products p ON p.product_id = pl.product_id\r\n        JOIN user_actions ua ON ua.order_id = o.order_id\r\n        JOIN ads_campaign_users acu ON acu.user_id = ua.user_id\r\n    WHERE o.order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\r\n    GROUP BY ads_campaign, time::date\r\n)\r\n\r\nSELECT\r\n    ads_campaign,\r\n    day,\r\n    ROUND(SUM(sales_amount) OVER(PARTITION BY ads_campaign ORDER BY day ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / MAX(number_of_users) OVER(PARTITION BY ads_campaign), 2) AS cumulative_arppu,\r\n    ROUND(cac, 2) AS cac\r\nFROM (\r\n    SELECT\r\n        nu.ads_campaign,\r\n        nu.day, \r\n        ads_cost / MAX(number_of_users) OVER(PARTITION BY nu.ads_campaign) AS cac\r\n    FROM number_of_users nu\r\n        JOIN ads_campaign_users acu ON acu.ads_campaign = nu.ads_campaign\r\n    GROUP BY nu.ads_campaign, nu.day, ads_cost, number_of_users\r\n) t \r\n    JOIN sales_by_user su USING(ads_campaign, day)\r\n    JOIN number_of_users nu USING(ads_campaign, day)\r\nWHERE ads_campaign = 'Кампания № 2'",
+          "query_hash": "eed33d2891bdd686a7765a96488036b5",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": false,
+          "updated_at": "2026-11-04T13:00:11.316Z",
+          "created_at": "2026-11-04T12:57:43.212Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44647,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 10,
+          "minSizeX": 2,
+          "maxSizeX": 6,
+          "minSizeY": 1,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 8
+        }
+      },
+      "dashboard_id": 11349,
+      "text": "",
+      "updated_at": "2026-11-04T10:52:38.556Z",
+      "created_at": "2026-11-04T10:52:38.556Z",
+      "visualization": {
+        "id": 209663,
+        "type": "PIVOT",
+        "name": "Cohort analysis of daily retention",
+        "description": "",
+        "options": {
+          "controls": {
+            "enabled": true
+          },
+          "rendererOptions": {
+            "table": {
+              "colTotals": true,
+              "rowTotals": true
+            }
+          },
+          "rows": [
+            "start_month",
+            "start_date"
+          ],
+          "cols": [
+            "day_number"
+          ],
+          "vals": [
+            "retention"
+          ],
+          "aggregatorName": "Average",
+          "valueFilter": {},
+          "sorters": {},
+          "rowOrder": "key_a_to_z",
+          "colOrder": "key_a_to_z",
+          "derivedAttributes": {},
+          "rendererName": "Table",
+          "hiddenAttributes": [],
+          "hiddenFromAggregators": [],
+          "hiddenFromDragDrop": [],
+          "menuLimit": 500,
+          "unusedOrientationCutoff": 85
+        },
+        "updated_at": "2026-11-04T11:29:21.782Z",
+        "created_at": "2026-11-04T10:52:25.699Z",
+        "query": {
+          "id": 137871,
+          "latest_query_data_id": 16892876,
+          "name": "дневной_retention_по_когортам_пользователей",
+          "description": null,
+          "query": "-- На основе данных в таблице user_actions рассчитайте показатель дневного Retention для всех пользователей, разбив их на когорты по дате первого взаимодействия с нашим приложением.\n-- В результат включите четыре колонки: месяц первого взаимодействия, дату первого взаимодействия, количество дней, прошедших с даты первого взаимодействия (порядковый номер \n-- дня начиная с 0), и само значение Retention. Метрику необходимо выразить в виде доли, округлив полученные значения до двух знаков после запятой. Месяц первого взаимодействия \n-- укажите в виде даты, округлённой до первого числа месяца. Результат должен быть отсортирован сначала по возрастанию даты первого взаимодействия, затем по возрастанию \n-- порядкового номера дня.\n-- Поля в результирующей таблице: start_month, start_date, day_number, retention\n\nSELECT\n    start_month,\n    start_date,\n    day_number,\n    ROUND(COUNT(DISTINCT user_id) * 1.0 / MAX(COUNT(DISTINCT user_id)) OVER(PARTITION BY start_date), 2) AS retention\nFROM (\n    SELECT\n        user_id,\n        DATE_TRUNC('month', MIN(time::date) OVER(PARTITION BY user_id))::date AS start_month,\n        MIN(time::date) OVER(PARTITION BY user_id) AS start_date,\n        (time::date - MIN(time::date) OVER(PARTITION BY user_id)) AS day_number\n    FROM user_actions\n) t\nGROUP BY \n    start_month,\n    start_date,\n    day_number\nORDER BY start_date, day_number",
+          "query_hash": "b6aad0f5ec37b51931471d170988cec1",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": false,
+          "updated_at": "2026-11-04T10:52:54.508Z",
+          "created_at": "2026-11-04T10:12:08.293Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44650,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 6,
+          "sizeY": 6,
+          "minSizeX": 2,
+          "maxSizeX": 6,
+          "minSizeY": 1,
+          "maxSizeY": 1000,
+          "col": 0,
+          "row": 18
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11349,
+      "text": "",
+      "updated_at": "2026-11-04T13:01:25.809Z",
+      "created_at": "2026-11-04T11:35:48.168Z",
+      "visualization": {
+        "id": 209672,
+        "type": "PIVOT",
+        "name": "Cohort analysis of daily retention in advertising campaigns",
+        "description": "",
+        "options": {
+          "controls": {
+            "enabled": true
+          },
+          "rendererOptions": {
+            "table": {
+              "colTotals": true,
+              "rowTotals": true
+            }
+          },
+          "rows": [
+            "ads_campaign"
+          ],
+          "cols": [
+            "day_number"
+          ],
+          "vals": [
+            "retention"
+          ],
+          "aggregatorName": "Average",
+          "valueFilter": {},
+          "sorters": {},
+          "rowOrder": "key_a_to_z",
+          "colOrder": "key_a_to_z",
+          "derivedAttributes": {},
+          "rendererName": "Table",
+          "hiddenAttributes": [],
+          "hiddenFromAggregators": [],
+          "hiddenFromDragDrop": [],
+          "menuLimit": 500,
+          "unusedOrientationCutoff": 85
+        },
+        "updated_at": "2026-11-04T14:39:33.150Z",
+        "created_at": "2026-11-04T11:25:38.418Z",
+        "query": {
+          "id": 137881,
+          "latest_query_data_id": 16893257,
+          "name": "r0_r1_r7_рекламных_кампаний",
+          "description": null,
+          "query": "-- Для каждой рекламной кампании посчитайте Retention 1-го и 7-го дня у привлечённых пользователей. Метрику необходимо выразить в виде доли, округлив полученные значения\n-- до двух знаков после запятой. Результат должен быть отсортирован сначала по наименованию кампании (по возрастанию), затем по возрастанию порядкового номера дня.\n-- В результат должны попасть следующие дни: нулевой, первый и седьмой.\n-- Поля в результирующей таблице: ads_campaign, start_date, day_number, retention\n\nWITH ads_campaign_users AS (\n    SELECT\n      user_id,\n      'Кампания № 1' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8631, 8632, 8638, 8643, 8657, 8673, 8706, 8707, 8715, 8723, 8732, 8739, 8741, \n        8750, 8751, 8752, 8770, 8774, 8788, 8791, 8804, 8810, 8815, 8828, 8830, 8845, \n        8853, 8859, 8867, 8869, 8876, 8879, 8883, 8896, 8909, 8911, 8933, 8940, 8972, \n        8976, 8988, 8990, 9002, 9004, 9009, 9019, 9020, 9035, 9036, 9061, 9069, 9071, \n        9075, 9081, 9085, 9089, 9108, 9113, 9144, 9145, 9146, 9162, 9165, 9167, 9175, \n        9180, 9182, 9197, 9198, 9210, 9223, 9251, 9257, 9278, 9287, 9291, 9313, 9317, \n        9321, 9334, 9351, 9391, 9398, 9414, 9420, 9422, 9431, 9450, 9451, 9454, 9472, \n        9476, 9478, 9491, 9494, 9505, 9512, 9518, 9524, 9526, 9528, 9531, 9535, 9550, \n        9559, 9561, 9562, 9599, 9603, 9605, 9611, 9612, 9615, 9625, 9633, 9652, 9654, \n        9655, 9660, 9662, 9667, 9677, 9679, 9689, 9695, 9720, 9726, 9739, 9740, 9762, \n        9778, 9786, 9794, 9804, 9810, 9813, 9818, 9828, 9831, 9836, 9838, 9845, 9871, \n        9887, 9891, 9896, 9897, 9916, 9945, 9960, 9963, 9965, 9968, 9971, 9993, 9998, \n        9999, 10001, 10013, 10016, 10023, 10030, 10051, 10057, 10064, 10082, 10103, \n        10105, 10122, 10134, 10135\n    )\n    GROUP BY user_id\n    --HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n      \n    UNION ALL \n    \n    SELECT\n      user_id,\n      'Кампания № 2' AS ads_campaign,\n      250000.0 AS ads_cost\n    FROM user_actions \n    WHERE user_id IN (\n        8629, 8630, 8644, 8646, 8650, 8655, 8659, 8660, 8663, 8665, 8670, 8675, 8680, 8681,\n        8682, 8683, 8694, 8697, 8700, 8704, 8712, 8713, 8719, 8729, 8733, 8742, 8748, 8754,\n        8771, 8794, 8795, 8798, 8803, 8805, 8806, 8812, 8814, 8825, 8827, 8838, 8849, 8851,\n        8854, 8855, 8870, 8878, 8882, 8886, 8890, 8893, 8900, 8902, 8913, 8916, 8923, 8929,\n        8935, 8942, 8943, 8949, 8953, 8955, 8966, 8968, 8971, 8973, 8980, 8995, 8999, 9000,\n        9007, 9013, 9041, 9042, 9047, 9064, 9068, 9077, 9082, 9083, 9095, 9103, 9109, 9117,\n        9123, 9127, 9131, 9137, 9140, 9149, 9161, 9179, 9181, 9183, 9185, 9190, 9196, 9203,\n        9207, 9226, 9227, 9229, 9230, 9231, 9250, 9255, 9259, 9267, 9273, 9281, 9282, 9289,\n        9292, 9303, 9310, 9312, 9315, 9327, 9333, 9335, 9337, 9343, 9356, 9368, 9370, 9383,\n        9392, 9404, 9410, 9421, 9428, 9432, 9437, 9468, 9479, 9483, 9485, 9492, 9495, 9497,\n        9498, 9500, 9510, 9527, 9529, 9530, 9538, 9539, 9545, 9557, 9558, 9560, 9564, 9567,\n        9570, 9591, 9596, 9598, 9616, 9631, 9634, 9635, 9636, 9658, 9666, 9672, 9684, 9692,\n        9700, 9704, 9706, 9711, 9719, 9727, 9735, 9741, 9744, 9749, 9752, 9753, 9755, 9757,\n        9764, 9783, 9784, 9788, 9790, 9808, 9820, 9839, 9841, 9843, 9853, 9855, 9859, 9863,\n        9877, 9879, 9880, 9882, 9883, 9885, 9901, 9904, 9908, 9910, 9912, 9920, 9929, 9930,\n        9935, 9939, 9958, 9959, 9961, 9983, 10027, 10033, 10038, 10045, 10047, 10048, 10058,\n        10059, 10067, 10069, 10073, 10075, 10078, 10079, 10081, 10092, 10106, 10110, 10113, 10131\n    ) \n    GROUP BY user_id\n    --HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\n)\n\nSELECT\n    ads_campaign,\n    start_date,\n    day_number,\n    ROUND(COUNT(DISTINCT user_id) * 1.0 / MAX(COUNT(DISTINCT user_id)) OVER(PARTITION BY ads_campaign, start_date), 2) AS retention\nFROM (\n    SELECT\n        ua.user_id,\n        MIN(time::date) OVER(PARTITION BY ua.user_id) AS start_date,\n        (time::date - MIN(time::date)  OVER(PARTITION BY ua.user_id)) AS day_number,\n        ads_campaign\n    FROM user_actions ua\n        JOIN ads_campaign_users acu ON ua.user_id = acu.user_id\n    WHERE ua.user_id IN (SELECT user_id FROM ads_campaign_users)\n) t\nWHERE day_number IN (0, 1, 7)\nGROUP BY\n    ads_campaign,\n    start_date,\n    day_number\nORDER BY ads_campaign, day_number",
+          "query_hash": "d10c3d0c4edb61f0681c7cb67930cd5a",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": true,
+          "updated_at": "2026-11-04T11:35:53.908Z",
+          "created_at": "2026-11-04T11:25:07.778Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "product",
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    },
+    {
+      "id": 44655,
+      "width": 1,
+      "options": {
+        "isHidden": false,
+        "position": {
+          "autoHeight": false,
+          "sizeX": 3,
+          "sizeY": 9,
+          "minSizeX": 1,
+          "maxSizeX": 6,
+          "minSizeY": 5,
+          "maxSizeY": 1000,
+          "col": 3,
+          "row": 24
+        },
+        "parameterMappings": {}
+      },
+      "dashboard_id": 11349,
+      "text": "",
+      "updated_at": "2026-11-04T13:01:38.720Z",
+      "created_at": "2026-11-04T12:59:23.410Z",
+      "visualization": {
+        "id": 209681,
+        "type": "CHART",
+        "name": "The dynamics of ARPU and CAC for the campaign №2",
+        "description": "",
+        "options": {
+          "globalSeriesType": "line",
+          "sortX": true,
+          "legend": {
+            "enabled": true,
+            "placement": "auto",
+            "traceorder": "normal"
+          },
+          "xAxis": {
+            "type": "-",
+            "labels": {
+              "enabled": true
+            }
+          },
+          "yAxis": [
+            {
+              "type": "linear"
+            },
+            {
+              "type": "linear",
+              "opposite": true
+            }
+          ],
+          "alignYAxesAtZero": false,
+          "error_y": {
+            "type": "data",
+            "visible": true
+          },
+          "series": {
+            "stacking": null,
+            "error_y": {
+              "type": "data",
+              "visible": true
+            }
+          },
+          "seriesOptions": {
+            "cumulative_arppu": {
+              "type": "area"
+            }
+          },
+          "valuesOptions": {},
+          "columnMapping": {
+            "day": "x",
+            "cumulative_arppu": "y",
+            "cac": "y"
+          },
+          "direction": {
+            "type": "counterclockwise"
+          },
+          "sizemode": "diameter",
+          "coefficient": 1,
+          "numberFormat": "0,0[.]00000",
+          "percentFormat": "0[.]00%",
+          "textFormat": "",
+          "missingValuesAsZero": true,
+          "showDataLabels": false,
+          "dateTimeFormat": "DD/MM/YY HH:mm",
+          "swappedAxes": false
+        },
+        "updated_at": "2026-11-04T13:00:25.000Z",
+        "created_at": "2026-11-04T12:59:13.208Z",
+        "query": {
+          "id": 137885,
+          "latest_query_data_id": 16894045,
+          "name": "накопительный_ARPPU_и_CAC_по_дням_кампания2",
+          "description": null,
+          "query": "-- Для каждой рекламной кампании для каждого дня посчитайте две метрики:\r\n--     1. Накопительный ARPPU.\r\n--     2. Затраты на привлечение одного покупателя (CAC).\r\n-- Значения метрики CAC укажите одинаковым для всех дней (это необходимо для наглядной визуализации). Дни пронумеруйте начиная с 0. Полученные значения метрик необходимо \r\n-- округлить до двух знаков после запятой. Результат должен быть отсортирован сначала по наименованию кампании (по возрастанию), затем по наименованию дня (также по возрастанию).\r\n-- Поля в результирующей таблице: ads_campaign, day, cumulative_arppu, cac\r\n\r\nWITH ads_campaign_users AS (\r\n    SELECT\r\n      user_id,\r\n      'Кампания № 1' AS ads_campaign,\r\n      250000.0 AS ads_cost\r\n    FROM user_actions \r\n    WHERE user_id IN (\r\n        8631, 8632, 8638, 8643, 8657, 8673, 8706, 8707, 8715, 8723, 8732, 8739, 8741, \r\n        8750, 8751, 8752, 8770, 8774, 8788, 8791, 8804, 8810, 8815, 8828, 8830, 8845, \r\n        8853, 8859, 8867, 8869, 8876, 8879, 8883, 8896, 8909, 8911, 8933, 8940, 8972, \r\n        8976, 8988, 8990, 9002, 9004, 9009, 9019, 9020, 9035, 9036, 9061, 9069, 9071, \r\n        9075, 9081, 9085, 9089, 9108, 9113, 9144, 9145, 9146, 9162, 9165, 9167, 9175, \r\n        9180, 9182, 9197, 9198, 9210, 9223, 9251, 9257, 9278, 9287, 9291, 9313, 9317, \r\n        9321, 9334, 9351, 9391, 9398, 9414, 9420, 9422, 9431, 9450, 9451, 9454, 9472, \r\n        9476, 9478, 9491, 9494, 9505, 9512, 9518, 9524, 9526, 9528, 9531, 9535, 9550, \r\n        9559, 9561, 9562, 9599, 9603, 9605, 9611, 9612, 9615, 9625, 9633, 9652, 9654, \r\n        9655, 9660, 9662, 9667, 9677, 9679, 9689, 9695, 9720, 9726, 9739, 9740, 9762, \r\n        9778, 9786, 9794, 9804, 9810, 9813, 9818, 9828, 9831, 9836, 9838, 9845, 9871, \r\n        9887, 9891, 9896, 9897, 9916, 9945, 9960, 9963, 9965, 9968, 9971, 9993, 9998, \r\n        9999, 10001, 10013, 10016, 10023, 10030, 10051, 10057, 10064, 10082, 10103, \r\n        10105, 10122, 10134, 10135\r\n    )\r\n    GROUP BY user_id\r\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\r\n      \r\n    UNION ALL \r\n    \r\n    SELECT\r\n      user_id,\r\n      'Кампания № 2' AS ads_campaign,\r\n      250000.0 AS ads_cost\r\n    FROM user_actions \r\n    WHERE user_id IN (\r\n        8629, 8630, 8644, 8646, 8650, 8655, 8659, 8660, 8663, 8665, 8670, 8675, 8680, 8681,\r\n        8682, 8683, 8694, 8697, 8700, 8704, 8712, 8713, 8719, 8729, 8733, 8742, 8748, 8754,\r\n        8771, 8794, 8795, 8798, 8803, 8805, 8806, 8812, 8814, 8825, 8827, 8838, 8849, 8851,\r\n        8854, 8855, 8870, 8878, 8882, 8886, 8890, 8893, 8900, 8902, 8913, 8916, 8923, 8929,\r\n        8935, 8942, 8943, 8949, 8953, 8955, 8966, 8968, 8971, 8973, 8980, 8995, 8999, 9000,\r\n        9007, 9013, 9041, 9042, 9047, 9064, 9068, 9077, 9082, 9083, 9095, 9103, 9109, 9117,\r\n        9123, 9127, 9131, 9137, 9140, 9149, 9161, 9179, 9181, 9183, 9185, 9190, 9196, 9203,\r\n        9207, 9226, 9227, 9229, 9230, 9231, 9250, 9255, 9259, 9267, 9273, 9281, 9282, 9289,\r\n        9292, 9303, 9310, 9312, 9315, 9327, 9333, 9335, 9337, 9343, 9356, 9368, 9370, 9383,\r\n        9392, 9404, 9410, 9421, 9428, 9432, 9437, 9468, 9479, 9483, 9485, 9492, 9495, 9497,\r\n        9498, 9500, 9510, 9527, 9529, 9530, 9538, 9539, 9545, 9557, 9558, 9560, 9564, 9567,\r\n        9570, 9591, 9596, 9598, 9616, 9631, 9634, 9635, 9636, 9658, 9666, 9672, 9684, 9692,\r\n        9700, 9704, 9706, 9711, 9719, 9727, 9735, 9741, 9744, 9749, 9752, 9753, 9755, 9757,\r\n        9764, 9783, 9784, 9788, 9790, 9808, 9820, 9839, 9841, 9843, 9853, 9855, 9859, 9863,\r\n        9877, 9879, 9880, 9882, 9883, 9885, 9901, 9904, 9908, 9910, 9912, 9920, 9929, 9930,\r\n        9935, 9939, 9958, 9959, 9961, 9983, 10027, 10033, 10038, 10045, 10047, 10048, 10058,\r\n        10059, 10067, 10069, 10073, 10075, 10078, 10079, 10081, 10092, 10106, 10110, 10113, 10131\r\n    ) \r\n    GROUP BY user_id\r\n    HAVING COUNT(DISTINCT order_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) >= 1\r\n ),\r\n \r\nnumber_of_users AS (\r\n    SELECT\r\n        ads_campaign,\r\n        'Day ' || (time::date - MIN(time::date) OVER(PARTITION BY ads_campaign))::varchar AS day,\r\n        COUNT(DISTINCT acu.user_id) AS number_of_users\r\n    FROM ads_campaign_users acu\r\n        JOIN user_actions ua ON acu.user_id = ua.user_id\r\n    GROUP BY\r\n        ads_campaign, time::date\r\n),\r\n\r\nsales_by_user AS (\r\n    SELECT\r\n        ads_campaign,\r\n        'Day ' || (time::date - MIN(time::date) OVER(PARTITION BY ads_campaign))::varchar AS day,\r\n        SUM(price) AS sales_amount\r\n    FROM orders o\r\n        CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\r\n        JOIN products p ON p.product_id = pl.product_id\r\n        JOIN user_actions ua ON ua.order_id = o.order_id\r\n        JOIN ads_campaign_users acu ON acu.user_id = ua.user_id\r\n    WHERE o.order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\r\n    GROUP BY ads_campaign, time::date\r\n)\r\n\r\nSELECT\r\n    ads_campaign,\r\n    day,\r\n    ROUND(SUM(sales_amount) OVER(PARTITION BY ads_campaign ORDER BY day ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / MAX(number_of_users) OVER(PARTITION BY ads_campaign), 2) AS cumulative_arppu,\r\n    ROUND(cac, 2) AS cac\r\nFROM (\r\n    SELECT\r\n        nu.ads_campaign,\r\n        nu.day, \r\n        ads_cost / MAX(number_of_users) OVER(PARTITION BY nu.ads_campaign) AS cac\r\n    FROM number_of_users nu\r\n        JOIN ads_campaign_users acu ON acu.ads_campaign = nu.ads_campaign\r\n    GROUP BY nu.ads_campaign, nu.day, ads_cost, number_of_users\r\n) t \r\n    JOIN sales_by_user su USING(ads_campaign, day)\r\n    JOIN number_of_users nu USING(ads_campaign, day)\r\nWHERE ads_campaign = 'Кампания № 2'",
+          "query_hash": "eed33d2891bdd686a7765a96488036b5",
+          "schedule": null,
+          "is_archived": false,
+          "is_draft": false,
+          "updated_at": "2026-11-04T13:00:11.316Z",
+          "created_at": "2026-11-04T12:57:43.212Z",
+          "data_source_id": 4,
+          "options": {
+            "apply_auto_limit": false,
+            "parameters": []
+          },
+          "version": 1,
+          "tags": [
+            "simulator_sql"
+          ],
+          "is_safe": true,
+          "user": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          },
+          "last_modified_by": {
+            "id": 56987,
+            "name": "Анастасия Егорова",
+            "email": "eg.nastyaa@gmail.com",
+            "profile_image_url": "https://www.gravatar.com/avatar/397852296df954d34cc8704af32a8c45?s=40&d=identicon",
+            "groups": [
+              2
+            ],
+            "updated_at": "2026-11-04T14:45:45.314Z",
+            "created_at": "2026-10-14T10:13:25.117Z",
+            "disabled_at": null,
+            "is_disabled": false,
+            "active_at": null,
+            "is_invitation_pending": false,
+            "is_email_verified": true,
+            "auth_type": "external"
+          }
+        }
+      }
+    }
+  ],
+  "options": {},
+  "is_archived": false,
+  "is_draft": true,
+  "tags": [
+    "product",
+    "sql_simulator"
+  ],
+  "updated_at": "2026-11-04T14:45:43.674Z",
+  "created_at": "2026-11-03T17:57:08.484Z",
+  "version": 2,
+  "is_favorite": true,
+  "can_edit": true
+}

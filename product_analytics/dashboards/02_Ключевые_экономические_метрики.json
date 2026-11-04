@@ -98,7 +98,7 @@
         "created_at": "2026-10-28T10:08:47.121Z",
         "query": {
           "id": 137228,
-          "latest_query_data_id": 16866818,
+          "latest_query_data_id": 16895240,
           "name": "накопительные_ARPU_ARPPU_и_средний_чек_по_дням",
           "description": null,
           "query": "-- По таблицам orders и user_actions для каждого дня рассчитайте следующие показатели:\n--  - Накопленную выручку на пользователя (Running ARPU).\n--  - Накопленную выручку на платящего пользователя (Running ARPPU).\n--  - Накопленную выручку с заказа, или средний чек (Running AOV).\n-- При расчёте всех показателей округляйте значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, running_arpu, running_arppu, running_aov\nWITH dates AS (\n  SELECT\n    DISTINCT time :: date AS date\n  FROM\n    user_actions\n),\nfirst_user_date AS (\n  SELECT\n    user_id,\n    MIN(time :: date) AS first_date\n  FROM\n    user_actions\n  GROUP BY\n    user_id\n),\nfirst_paying_user_date AS (\n  SELECT\n    ua.user_id,\n    MIN(ua.time :: date) AS first_paid_date\n  FROM\n    user_actions ua\n  WHERE\n    ua.action = 'create_order'\n    AND NOT EXISTS (\n      SELECT\n        1\n      FROM\n        user_actions canceled\n      WHERE\n        canceled.order_id = ua.order_id\n        AND canceled.action = 'cancel_order'\n    )\n  GROUP BY\n    ua.user_id\n),\nrunning_number_of_users AS (\n  SELECT\n    d.date,\n    (\n      SELECT\n        COUNT(*)\n      FROM\n        first_user_date f\n      WHERE\n        f.first_date <= d.date\n    ) AS running_total_users,\n    (\n      SELECT\n        COUNT(*)\n      FROM\n        first_paying_user_date p\n      WHERE\n        p.first_paid_date <= d.date\n    ) AS running_paying_users\n  FROM\n    dates d\n),\norder_revenue AS (\n  SELECT\n    o.order_id,\n    o.creation_time :: date AS date,\n    SUM(pr.price) AS order_revenue\n  FROM\n    orders o\n    CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\n    JOIN products pr ON pr.product_id = pl.product_id\n  WHERE\n    EXISTS (\n      SELECT\n        1\n      FROM\n        courier_actions ca\n      WHERE\n        ca.order_id = o.order_id\n        AND ca.action = 'deliver_order'\n    )\n    AND NOT EXISTS (\n      SELECT\n        1\n      FROM\n        user_actions ua\n      WHERE\n        ua.order_id = o.order_id\n        AND ua.action = 'cancel_order'\n    )\n  GROUP BY\n    o.order_id,\n    o.creation_time :: date\n),\ndaily_revenue AS (\n  SELECT\n    date,\n    SUM(order_revenue) AS revenue,\n    COUNT(order_id) AS orders_count\n  FROM\n    order_revenue\n  GROUP BY\n    date\n),\nrunning_revenue AS (\n  SELECT\n    d.date,\n    SUM(COALESCE(dr.revenue, 0)) OVER (\n      ORDER BY\n        d.date ROWS BETWEEN UNBOUNDED PRECEDING\n        AND CURRENT ROW\n    ) AS running_revenue,\n    SUM(COALESCE(dr.orders_count, 0)) OVER (\n      ORDER BY\n        d.date ROWS BETWEEN UNBOUNDED PRECEDING\n        AND CURRENT ROW\n    ) AS running_orders_count\n  FROM\n    dates d\n    LEFT JOIN daily_revenue dr ON dr.date = d.date\n)\nSELECT\n  rr.date,\n  ROUND(\n    rr.running_revenue :: numeric / rnou.running_total_users,\n    2\n  ) AS running_arpu,\n  ROUND(\n    rr.running_revenue :: numeric / rnou.running_paying_users,\n    2\n  ) AS running_arppu,\n  ROUND(\n    rr.running_revenue :: numeric / rr.running_orders_count,\n    2\n  ) AS running_aov\nFROM\n  running_revenue rr\n  JOIN running_number_of_users rnou ON rnou.date = rr.date\nORDER BY\n  rr.date",
@@ -127,7 +127,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -144,7 +144,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -242,7 +242,7 @@
         "created_at": "2026-10-29T19:57:49.755Z",
         "query": {
           "id": 137319,
-          "latest_query_data_id": 16866820,
+          "latest_query_data_id": 16895238,
           "name": "ARPU_ARPPU_и_AOV_по_дням_недели",
           "description": null,
           "query": "-- Для каждого дня недели в таблицах orders и user_actions рассчитайте следующие показатели:\n--  - Выручку на пользователя (ARPU).\n--  - Выручку на платящего пользователя (ARPPU).\n--  - Выручку на заказ (AOV).\n-- При расчётах учитывайте данные только за период с 26 августа 2022 года по 8 сентября 2022 года включительно — так, чтобы в анализ попало одинаковое количество \n-- всех дней недели (ровно по два дня). В результирующую таблицу включите как наименования дней недели (например, Monday), так и порядковый номер дня недели \n-- (от 1 до 7, где 1 — это Monday, 7 — это Sunday). При расчёте всех показателей округляйте значения до двух знаков после запятой.\n-- Результат должен быть отсортирован по возрастанию порядкового номера дня недели.\n-- Поля в результирующей таблице: weekday, weekday_number, arpu, arppu, aov\n\nWITH revenue AS (\n    SELECT\n        weekday,\n        weekday_number,\n        SUM(price) AS revenue\n    FROM (SELECT \n            to_char(creation_time::date, 'Day') AS weekday,\n            CASE\n                WHEN DATE_PART('dow', creation_time::date) = 0.0 THEN 7.0\n                ELSE DATE_PART('dow', creation_time::date)\n            END AS weekday_number,\n            order_id,\n            pl.product_id,\n            price\n        FROM orders o \n            CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\n            JOIN products p ON pl.product_id = p.product_id\n        WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n            AND order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n            AND creation_time BETWEEN '2022-08-26' AND '2022-09-08 23:59:59') t\n    GROUP BY weekday, weekday_number\n),\nnumber_of_users AS (\n    SELECT\n        to_char(time::date, 'Day') AS weekday,\n        CASE\n            WHEN DATE_PART('dow', time::date) = 0.0 THEN 7.0\n            ELSE DATE_PART('dow', time::date)\n        END AS weekday_number,\n        COUNT(DISTINCT user_id) AS total_users,\n        COUNT(DISTINCT user_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order') AND action = 'create_order') AS paying_users\n    FROM user_actions\n    WHERE time BETWEEN '2022-08-26' AND '2022-09-08 23:59:59'\n    GROUP BY weekday, weekday_number\n),\n\nnumber_of_orders AS (\n    SELECT\n        to_char(creation_time::date, 'Day') AS weekday,\n        CASE\n            WHEN DATE_PART('dow', creation_time::date) = 0.0 THEN 7.0\n            ELSE DATE_PART('dow', creation_time::date)\n        END AS weekday_number,\n        COUNT(DISTINCT order_id) AS total_orders\n    FROM orders\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order') \n        AND order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n        AND creation_time BETWEEN '2022-08-26' AND '2022-09-08 23:59:59'\n    GROUP BY weekday, weekday_number\n)\n\nSELECT\n    r.weekday,\n    r.weekday_number,\n    ROUND(revenue / total_users, 2) AS arpu,\n    ROUND(revenue / paying_users, 2) AS arppu,\n    ROUND(revenue / total_orders, 2) AS aov\nFROM revenue r\n    JOIN number_of_users nou\n        ON r.weekday_number = nou.weekday_number\n    JOIN number_of_orders noo\n        ON r.weekday_number = noo.weekday_number\nORDER BY weekday_number\n",
@@ -271,7 +271,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -288,7 +288,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -384,7 +384,7 @@
         "created_at": "2026-10-30T21:09:27.329Z",
         "query": {
           "id": 137545,
-          "latest_query_data_id": 16866817,
+          "latest_query_data_id": 16895235,
           "name": "выручка_новых_и_старых_пользователей_по_дням",
           "description": null,
           "query": "-- Для каждого дня в таблицах orders и user_actions рассчитайте следующие показатели:\n--  - Выручку, полученную в этот день.\n--  - Выручку с заказов новых пользователей, полученную в этот день.\n--  - Долю выручки с заказов новых пользователей в общей выручке, полученной за этот день.\n--  - Долю выручки с заказов остальных пользователей в общей выручке, полученной за этот день.\n-- Все показатели долей необходимо выразить в процентах. При их расчёте округляйте значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, revenue, new_users_revenue, new_users_revenue_share, old_users_revenue_share\n\nWITH user_cohorts AS (\n    SELECT\n        DISTINCT ua.time::date AS date,\n        ua.user_id, \n        CASE\n            WHEN first_day != ua.time::date THEN false\n            ELSE true\n        END AS is_first_day\n    FROM user_actions ua\n        JOIN (SELECT user_id, MIN(time::date) AS first_day FROM user_actions GROUP BY user_id) ud ON ua.user_id = ud.user_id\n    WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        AND order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n),\n\nrevenue AS ( \n    SELECT \n        creation_time::date AS date,\n        ua.user_id,\n        is_first_day,\n        price\n    FROM orders o\n        CROSS JOIN LATERAL unnest(product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n        JOIN user_actions ua ON ua.order_id = o.order_id\n        JOIN user_cohorts uc ON uc.user_id = ua.user_id AND uc.date = o.creation_time::date\n    WHERE o.order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        AND o.order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n)\n\nSELECT\n    r.date,\n    SUM(price) AS revenue,\n    SUM(price) FILTER(WHERE is_first_day = true) AS new_users_revenue,\n    ROUND(SUM(price) FILTER(WHERE is_first_day = true) / SUM(price) * 100, 2) AS new_users_revenue_share,\n    COALESCE(ROUND(SUM(price) FILTER(WHERE is_first_day = false) / SUM(price) * 100, 2), 0.0) AS old_users_revenue_share\nFROM revenue r\nGROUP BY r.date",
@@ -413,7 +413,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -430,7 +430,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -537,7 +537,7 @@
         "created_at": "2026-10-26T09:51:17.896Z",
         "query": {
           "id": 137158,
-          "latest_query_data_id": 16866815,
+          "latest_query_data_id": 16895233,
           "name": "ежедневная_выручка_накопительная_выручка_и_её_прирост",
           "description": null,
           "query": "-- Для каждого дня в таблице orders рассчитайте следующие показатели:\n--  - Выручку, полученную в этот день.\n--  - Суммарную выручку на текущий день.\n--  - Прирост выручки, полученной в этот день, относительно значения выручки за предыдущий день.\n-- Прирост выручки рассчитайте в процентах и округлите значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, revenue, total_revenue, revenue_change\n\nSELECT\n    date,\n    revenue,\n    SUM(revenue) OVER(ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_revenue,\n    ROUND((revenue::decimal - LAG(revenue) OVER(ORDER BY date)) / LAG(revenue) OVER(ORDER BY date) * 100, 2) AS revenue_change\nFROM (    \n    SELECT\n        creation_time::date AS date,\n        SUM(price) AS revenue\n    FROM orders o\n        CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order') \n        AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY 1\n    ) t\nGROUP BY date, revenue",
@@ -566,7 +566,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -583,7 +583,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -679,7 +679,7 @@
         "created_at": "2026-10-26T09:51:50.129Z",
         "query": {
           "id": 137158,
-          "latest_query_data_id": 16866815,
+          "latest_query_data_id": 16895233,
           "name": "ежедневная_выручка_накопительная_выручка_и_её_прирост",
           "description": null,
           "query": "-- Для каждого дня в таблице orders рассчитайте следующие показатели:\n--  - Выручку, полученную в этот день.\n--  - Суммарную выручку на текущий день.\n--  - Прирост выручки, полученной в этот день, относительно значения выручки за предыдущий день.\n-- Прирост выручки рассчитайте в процентах и округлите значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, revenue, total_revenue, revenue_change\n\nSELECT\n    date,\n    revenue,\n    SUM(revenue) OVER(ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_revenue,\n    ROUND((revenue::decimal - LAG(revenue) OVER(ORDER BY date)) / LAG(revenue) OVER(ORDER BY date) * 100, 2) AS revenue_change\nFROM (    \n    SELECT\n        creation_time::date AS date,\n        SUM(price) AS revenue\n    FROM orders o\n        CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order') \n        AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY 1\n    ) t\nGROUP BY date, revenue",
@@ -708,7 +708,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -725,7 +725,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -823,7 +823,7 @@
         "created_at": "2026-10-27T07:16:57.454Z",
         "query": {
           "id": 137159,
-          "latest_query_data_id": 16866816,
+          "latest_query_data_id": 16895237,
           "name": "ARPU_ARPPU_и_средний_чек_по_дням",
           "description": null,
           "query": "-- Для каждого дня в таблицах orders и user_actions рассчитайте следующие показатели:\n--  - Выручку на пользователя (ARPU) за текущий день.\n--  - Выручку на платящего пользователя (ARPPU) за текущий день.\n--  - Выручку с заказа, или средний чек (AOV) за текущий день.\n-- При расчёте всех показателей округляйте значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты. \n-- Поля в результирующей таблице: date, arpu, arppu, aov\n\nWITH revenue_metrics AS (\n    SELECT\n        date,\n        revenue,\n        avg_order_value,\n        SUM(revenue) OVER(ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_revenue,\n        ROUND((revenue::decimal - LAG(revenue) OVER(ORDER BY date)) / LAG(revenue) OVER(ORDER BY date) * 100, 2) AS revenue_change\n    FROM (    \n        SELECT\n            creation_time::date AS date,\n            SUM(price) AS revenue,\n            ROUND(SUM(price) / COUNT(DISTINCT order_id), 2) AS avg_order_value\n        FROM orders o\n            CROSS JOIN LATERAL unnest(o.product_ids) AS pl(product_id)\n            JOIN products p ON p.product_id = pl.product_id\n        WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order') \n            AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        GROUP BY 1\n        ) t\n    GROUP BY date, revenue, avg_order_value\n),\n\nnumber_of_uers AS (\n    SELECT\n        time::date AS date,\n        count(DISTINCT user_id) AS total_users,\n        count(DISTINCT user_id) FILTER(WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')) AS paying_users\n    FROM user_actions\n    GROUP BY 1\n)\n\nSELECT\n    creation_time:: date AS date,\n    ROUND(revenue / total_users, 2) AS arpu,\n    ROUND(revenue / paying_users, 2) AS arppu,\n    avg_order_value AS aov\nFROM orders o\n    JOIN revenue_metrics rm ON rm.date = o.creation_time::date\n    JOIN number_of_uers nou ON nou.date = o.creation_time::date\nGROUP BY\n     1, 2, 3, 4",
@@ -852,7 +852,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -869,7 +869,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -967,7 +967,7 @@
         "created_at": "2026-10-31T10:31:18.102Z",
         "query": {
           "id": 137547,
-          "latest_query_data_id": 16866819,
+          "latest_query_data_id": 16895234,
           "name": "выручка_и_доля_товаров_в_общей_выручке",
           "description": null,
           "query": "-- Для каждого товара, представленного в таблице products, за весь период времени в таблице orders рассчитайте следующие показатели:\n--  - Суммарную выручку, полученную от продажи этого товара за весь период.\n--  - Долю выручки от продажи этого товара в общей выручке, полученной за весь период.\n-- Долю выручки с каждого товара необходимо выразить в процентах. При её расчёте округляйте значения до двух знаков после запятой. Товары, округлённая доля которых в выручке \n-- составляет менее 0.5%, объедините в общую группу с названием «ДРУГОЕ» (без кавычек), просуммировав округлённые доли этих товаров. Результат должен быть отсортирован \n-- по убыванию выручки от продажи товара.\n-- Поля в результирующей таблице: product_name, revenue, share_in_revenue\n\nWITH revenue_by_products AS ( \n    SELECT \n        DISTINCT p.name AS product_name,\n        SUM(price) OVER(PARTITION BY pl.product_id) AS revenue_by_products,\n        SUM(price) OVER() AS revenue\n    FROM orders o\n        CROSS JOIN LATERAL unnest(product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n    WHERE o.order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        AND o.order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n)\n\nSELECT\n    product_name,\n    SUM(revenue) AS revenue,\n    SUM(share_in_revenue) AS share_in_revenue\nFROM (SELECT\n    CASE\n        WHEN ROUND(revenue_by_products / revenue * 100, 2) < 0.5 THEN 'ДРУГОЕ'\n        ELSE product_name\n    END AS product_name,\n    revenue_by_products AS revenue,\n    ROUND(revenue_by_products / revenue * 100, 2) AS share_in_revenue\nFROM revenue_by_products) t\nGROUP BY product_name\nORDER BY revenue DESC",
@@ -996,7 +996,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -1013,7 +1013,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -1120,7 +1120,7 @@
         "created_at": "2026-11-01T10:21:37.411Z",
         "query": {
           "id": 137579,
-          "latest_query_data_id": 16866691,
+          "latest_query_data_id": 16895242,
           "name": "выручка_затраты_и_валовая_прибыл",
           "description": null,
           "query": "-- Для каждого дня в таблицах orders и courier_actions рассчитайте следующие показатели:\n--  - Выручку, полученную в этот день.\n--  - Затраты, образовавшиеся в этот день.\n--  - Сумму НДС с продажи товаров в этот день.\n--  - Валовую прибыль в этот день (выручка за вычетом затрат и НДС).\n--  - Суммарную выручку на текущий день.\n--  - Суммарные затраты на текущий день.\n--  - Суммарный НДС на текущий день.\n--  - Суммарную валовую прибыль на текущий день.\n--  - Долю валовой прибыли в выручке за этот день (долю п.4 в п.1).\n--  - Долю суммарной валовой прибыли в суммарной выручке на текущий день (долю п.8 в п.5).\n-- Долю валовой прибыли в выручке необходимо выразить в процентах, округлив значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, revenue, costs, tax, gross_profit, total_revenue, total_costs, total_tax, total_gross_profit, gross_profit_ratio,total_gross_profit_ratio\n\n-- august_2022 = 120 000\n-- september_2022 = 150 000\n\n-- expenses_per_order_aug22 = 140\n-- expenses_per_courier_aug22 = 150\n-- expenses_per_courier_aug22 = 400 (orders_per_courier >= 5)\n\n-- expenses_per_order_sep22 = 115\n-- expenses_per_courier_sep22 = 150\n-- expenses_per_courier_sep22 = 500 (orders_per_courier >= 5)\n\nWITH expenses AS (\n    SELECT\n        c.date,\n        SUM(expenses_per_courier) AS expenses_per_courier,\n        expenses_per_order,\n        CASE\n            WHEN DATE_PART('month', c.date) = 8.0 THEN 120000.0\n            ELSE 150000 * 1.0\n        END AS fixed_costs\n    FROM (\n        SELECT\n            time::date AS date,\n            courier_id,\n            COUNT(DISTINCT order_id) AS number_of_orders,\n            CASE\n                WHEN COUNT(DISTINCT order_id) < 5 THEN COUNT(DISTINCT order_id) * 150\n                WHEN COUNT(DISTINCT order_id) >= 5 AND DATE_PART('month', time::date) = 9.0 THEN COUNT(DISTINCT order_id) * 150 + 500\n                ELSE COUNT(DISTINCT order_id) * 150 + 400\n            END AS expenses_per_courier\n        FROM courier_actions\n        WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order') AND action = 'deliver_order'\n        GROUP BY date, courier_id\n    ) c\n    JOIN (\n        SELECT\n            creation_time::date AS date,\n            COUNT(DISTINCT order_id) AS number_of_orders,\n            CASE\n                WHEN DATE_PART('month', creation_time::date) = 8.0 THEN COUNT(DISTINCT order_id) * 140\n                ELSE COUNT(DISTINCT order_id) * 115\n            END AS expenses_per_order\n        FROM orders\n        WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        GROUP BY date\n    ) o \n    ON c.date = o.date\n    GROUP BY c.date, expenses_per_order\n),\n\nrevenue AS (\n    SELECT\n        creation_time::date AS date,\n        SUM(price) AS revenue\n    FROM orders o\n        CROSS JOIN LATERAL unnest(product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n        AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY date\n),\n\ntaxes AS (\n    SELECT\n        product_id,\n        name,\n        price,\n        CASE\n            WHEN name IN ('сахар', 'сухарики', 'сушки', 'семечки', \n                          'масло льняное', 'виноград', 'масло оливковое', \n                          'арбуз', 'батон', 'йогурт', 'сливки', 'гречка', \n                          'овсянка', 'макароны', 'баранина', 'апельсины', \n                          'бублики', 'хлеб', 'горох', 'сметана', 'рыба копченая', \n                          'мука', 'шпроты', 'сосиски', 'свинина', 'рис', \n                          'масло кунжутное', 'сгущенка', 'ананас', 'говядина', \n                          'соль', 'рыба вяленая', 'масло подсолнечное', 'яблоки', \n                          'груши', 'лепешка', 'молоко', 'курица', 'лаваш', 'вафли', 'мандарины') \n            THEN ROUND(price * 10 / 110, 2)  \n            ELSE ROUND(price * 20 / 120, 2)  \n        END AS tax\n    FROM products\n),\n\ntaxes_per_day AS (\n    SELECT\n        creation_time::date AS date,\n        SUM(tax) AS tax\n    FROM orders o\n        CROSS JOIN LATERAL unnest(product_ids) AS pl(product_id)\n        JOIN taxes t ON t.product_id = pl.product_id\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n        AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY creation_time::date\n)\n\nSELECT\n    r.date,\n    revenue,\n    expenses_per_order + expenses_per_courier + fixed_costs AS costs,\n    tax,\n    revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax AS gross_profit,\n    SUM(revenue) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_revenue,\n    SUM(expenses_per_order + expenses_per_courier + fixed_costs) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_costs,\n    SUM(tax) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_tax,\n    SUM(revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_gross_profit,\n    ROUND((revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax) / revenue * 100, 2) AS gross_profit_ratio,\n    ROUND(SUM(revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / \n        SUM(revenue) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) * 100, 2) AS total_gross_profit_ratio\nFROM revenue r\n    JOIN expenses e ON r.date = e.date\n    JOIN taxes_per_day t ON r.date = t.date\n    \n\n",
@@ -1149,7 +1149,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -1166,7 +1166,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -1272,7 +1272,7 @@
         "created_at": "2026-11-01T10:26:22.734Z",
         "query": {
           "id": 137579,
-          "latest_query_data_id": 16866691,
+          "latest_query_data_id": 16895242,
           "name": "выручка_затраты_и_валовая_прибыл",
           "description": null,
           "query": "-- Для каждого дня в таблицах orders и courier_actions рассчитайте следующие показатели:\n--  - Выручку, полученную в этот день.\n--  - Затраты, образовавшиеся в этот день.\n--  - Сумму НДС с продажи товаров в этот день.\n--  - Валовую прибыль в этот день (выручка за вычетом затрат и НДС).\n--  - Суммарную выручку на текущий день.\n--  - Суммарные затраты на текущий день.\n--  - Суммарный НДС на текущий день.\n--  - Суммарную валовую прибыль на текущий день.\n--  - Долю валовой прибыли в выручке за этот день (долю п.4 в п.1).\n--  - Долю суммарной валовой прибыли в суммарной выручке на текущий день (долю п.8 в п.5).\n-- Долю валовой прибыли в выручке необходимо выразить в процентах, округлив значения до двух знаков после запятой. Результат должен быть отсортирован по возрастанию даты.\n-- Поля в результирующей таблице: date, revenue, costs, tax, gross_profit, total_revenue, total_costs, total_tax, total_gross_profit, gross_profit_ratio,total_gross_profit_ratio\n\n-- august_2022 = 120 000\n-- september_2022 = 150 000\n\n-- expenses_per_order_aug22 = 140\n-- expenses_per_courier_aug22 = 150\n-- expenses_per_courier_aug22 = 400 (orders_per_courier >= 5)\n\n-- expenses_per_order_sep22 = 115\n-- expenses_per_courier_sep22 = 150\n-- expenses_per_courier_sep22 = 500 (orders_per_courier >= 5)\n\nWITH expenses AS (\n    SELECT\n        c.date,\n        SUM(expenses_per_courier) AS expenses_per_courier,\n        expenses_per_order,\n        CASE\n            WHEN DATE_PART('month', c.date) = 8.0 THEN 120000.0\n            ELSE 150000 * 1.0\n        END AS fixed_costs\n    FROM (\n        SELECT\n            time::date AS date,\n            courier_id,\n            COUNT(DISTINCT order_id) AS number_of_orders,\n            CASE\n                WHEN COUNT(DISTINCT order_id) < 5 THEN COUNT(DISTINCT order_id) * 150\n                WHEN COUNT(DISTINCT order_id) >= 5 AND DATE_PART('month', time::date) = 9.0 THEN COUNT(DISTINCT order_id) * 150 + 500\n                ELSE COUNT(DISTINCT order_id) * 150 + 400\n            END AS expenses_per_courier\n        FROM courier_actions\n        WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order') AND action = 'deliver_order'\n        GROUP BY date, courier_id\n    ) c\n    JOIN (\n        SELECT\n            creation_time::date AS date,\n            COUNT(DISTINCT order_id) AS number_of_orders,\n            CASE\n                WHEN DATE_PART('month', creation_time::date) = 8.0 THEN COUNT(DISTINCT order_id) * 140\n                ELSE COUNT(DISTINCT order_id) * 115\n            END AS expenses_per_order\n        FROM orders\n        WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n        GROUP BY date\n    ) o \n    ON c.date = o.date\n    GROUP BY c.date, expenses_per_order\n),\n\nrevenue AS (\n    SELECT\n        creation_time::date AS date,\n        SUM(price) AS revenue\n    FROM orders o\n        CROSS JOIN LATERAL unnest(product_ids) AS pl(product_id)\n        JOIN products p ON p.product_id = pl.product_id\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n        AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY date\n),\n\ntaxes AS (\n    SELECT\n        product_id,\n        name,\n        price,\n        CASE\n            WHEN name IN ('сахар', 'сухарики', 'сушки', 'семечки', \n                          'масло льняное', 'виноград', 'масло оливковое', \n                          'арбуз', 'батон', 'йогурт', 'сливки', 'гречка', \n                          'овсянка', 'макароны', 'баранина', 'апельсины', \n                          'бублики', 'хлеб', 'горох', 'сметана', 'рыба копченая', \n                          'мука', 'шпроты', 'сосиски', 'свинина', 'рис', \n                          'масло кунжутное', 'сгущенка', 'ананас', 'говядина', \n                          'соль', 'рыба вяленая', 'масло подсолнечное', 'яблоки', \n                          'груши', 'лепешка', 'молоко', 'курица', 'лаваш', 'вафли', 'мандарины') \n            THEN ROUND(price * 10 / 110, 2)  \n            ELSE ROUND(price * 20 / 120, 2)  \n        END AS tax\n    FROM products\n),\n\ntaxes_per_day AS (\n    SELECT\n        creation_time::date AS date,\n        SUM(tax) AS tax\n    FROM orders o\n        CROSS JOIN LATERAL unnest(product_ids) AS pl(product_id)\n        JOIN taxes t ON t.product_id = pl.product_id\n    WHERE order_id IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order')\n        AND order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')\n    GROUP BY creation_time::date\n)\n\nSELECT\n    r.date,\n    revenue,\n    expenses_per_order + expenses_per_courier + fixed_costs AS costs,\n    tax,\n    revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax AS gross_profit,\n    SUM(revenue) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_revenue,\n    SUM(expenses_per_order + expenses_per_courier + fixed_costs) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_costs,\n    SUM(tax) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_tax,\n    SUM(revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total_gross_profit,\n    ROUND((revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax) / revenue * 100, 2) AS gross_profit_ratio,\n    ROUND(SUM(revenue - (expenses_per_order + expenses_per_courier + fixed_costs) - tax) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / \n        SUM(revenue) OVER(ORDER BY r.date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) * 100, 2) AS total_gross_profit_ratio\nFROM revenue r\n    JOIN expenses e ON r.date = e.date\n    JOIN taxes_per_day t ON r.date = t.date\n    \n\n",
@@ -1301,7 +1301,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
@@ -1318,7 +1318,7 @@
             "groups": [
               2
             ],
-            "updated_at": "2026-11-01T10:34:12.052Z",
+            "updated_at": "2026-11-04T14:45:45.314Z",
             "created_at": "2026-10-14T10:13:25.117Z",
             "disabled_at": null,
             "is_disabled": false,
